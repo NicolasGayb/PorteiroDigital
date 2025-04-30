@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "sua_chave_secreta_aqui")
 
-# URL do banco de dados (pode ser ajustada para produção)
+# Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///usuarios.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -18,10 +18,15 @@ class Usuario(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
-    tipo = db.Column(db.String(50), nullable=False)  # Administrador, Dono do prédio, Zelador, Condomino
+    tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
 
-# Rota inicial - login e cadastro
-@app.route('/', methods=['GET', 'POST'])
+# Rota inicial - Página de marketing com botão de login/registro
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Tela de login
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
@@ -39,32 +44,39 @@ def login():
 
     return render_template('login.html')
 
-# Rota de cadastro
-@app.route('/register', methods=['POST'])
+# Tela de cadastro
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    nome = request.form['nome']
-    email = request.form['email']
-    senha = request.form['senha']
-    confirma = request.form['confirma_senha']
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        senha = request.form['senha']
+        confirma = request.form['confirma_senha']
+        tipo = request.form['tipo']  # Tipo de usuário escolhido
 
-    if senha != confirma:
-        flash("As senhas não coincidem.", "danger")
+        # Verificação se senhas coincidem
+        if senha != confirma:
+            flash("As senhas não coincidem.", "danger")
+            return redirect(url_for('register'))
+
+        # Verificação de usuário já existente
+        usuario_existente = Usuario.query.filter_by(email=email).first()
+        if usuario_existente:
+            flash("Já existe um usuário com esse email.", "warning")
+            return redirect(url_for('register'))
+
+        # Criação do novo usuário
+        hash_senha = generate_password_hash(senha)
+        novo_usuario = Usuario(nome=nome, email=email, senha=hash_senha, tipo=tipo)
+        db.session.add(novo_usuario)
+        db.session.commit()
+
+        flash("Cadastro realizado com sucesso!", "success")
         return redirect(url_for('login'))
 
-    usuario_existente = Usuario.query.filter_by(email=email).first()
-    if usuario_existente:
-        flash("Já existe um usuário com esse email.", "warning")
-        return redirect(url_for('login'))
+    return render_template('register.html')
 
-    hash_senha = generate_password_hash(senha)
-    novo_usuario = Usuario(nome=nome, email=email, senha=hash_senha, tipo='Condomino')  # padrão
-    db.session.add(novo_usuario)
-    db.session.commit()
-
-    flash("Usuário cadastrado com sucesso!", "success")
-    return redirect(url_for('login'))
-
-# Rota do painel (redireciona conforme tipo de usuário)
+# Rota de redirecionamento para o painel conforme tipo de usuário
 @app.route('/painel')
 def painel():
     if 'usuario_id' not in session:
@@ -77,37 +89,38 @@ def painel():
         return redirect(url_for('painel_condomino'))
     elif tipo == 'Administrador':
         return redirect(url_for('painel_admin'))
-    elif tipo == 'Proprietario':
+    elif tipo == 'Dono do prédio':
         return redirect(url_for('painel_dono'))
     else:
         return "Tipo de usuário não reconhecido"
 
-# Painel do zelador
+# Painel do Zelador
 @app.route('/painel/zelador')
 def painel_zelador():
-    return "Painel do Zelador - Aqui ele pode registrar entregas."
+    return render_template('painel_zelador.html')
 
-# Painel do condômino
+# Painel do Condômino
 @app.route('/painel/condomino')
 def painel_condomino():
-    return "Painel do Condômino - Aqui ele pode visualizar entregas."
+    return render_template('painel_condomino.html')
 
-# Painel do dono do condomínio
+# Painel do Dono do Prédio
 @app.route('/painel/dono')
 def painel_dono():
-    return "Painel do Dono do Prédio - Aqui ele pode gerenciar o condomínio."
+    return render_template('painel_dono.html')
 
-# Painel do administrador
+# Painel do Administrador
 @app.route('/painel/admin')
 def painel_admin():
-    return "Painel do Administrador - Aqui ele pode gerenciar usuários e configurações."
-# Logout
+    return render_template('painel_admin.html')
+
+# Rota para logout
 @app.route('/logout')
 def logout():
     session.clear()
     flash("Você saiu da sessão.", "info")
     return redirect(url_for('login'))
 
-# Inicialização
+# Inicialização da aplicação
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
