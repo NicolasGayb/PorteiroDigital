@@ -1,0 +1,116 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fonte base e plano de fundo */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Container principal */
+.container {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Cartão de formulário */
+.form-card {
+    background: white;
+    padding: 30px 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
+h2, h3 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+/* Formulários */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1em;
+}
+
+/* Botão */
+button {
+    background-color: #00bfff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0095cc;
+}
+
+/* Link de senha */
+.link {
+    font-size: 0.9em;
+    text-align: right;
+    color: #00bfff;
+    text-decoration: none;
+}
+
+/* Divisor visual */
+.divider {
+    height: 1px;
+    background-color: #ddd;
+    margin: 25px 0;
+}
+
+/* Termos e políticas */
+.terms {
+    font-size: 0.8em;
+    text-align: center;
+    color: #555;
+}
+
+.terms a {
+    color: #00bfff;
+    text-decoration: none;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .form-card {
+        padding: 20px 15px;
+    }
+
+    h2, h3 {
+        font-size: 1.4em;
+    }
+
+    input, button {
+        font-size: 0.95em;
+    }
+}

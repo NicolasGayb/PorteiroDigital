@@ -1,0 +1,15 @@
+<h2>Bem-vindo, Zelador!</h2>
+
+<h3>Nova Encomenda</h3>
+<form method="POST" action="/nova-encomenda">
+  <input type="text" name="recipient_name" placeholder="Nome do condômino" required>
+  <input type="text" name="apartment" placeholder="Apartamento" required>
+  <button type="submit">Registrar</button>
+</form>
+
+<h3>Encomendas Registradas</h3>
+<ul>
+  {% for p in encomendas %}
+    <li>{{ p.recipient_name }} - Apt {{ p.apartment }} - Entregue: {{ p.delivered }}</li>
+  {% endfor %}
+</ul>
