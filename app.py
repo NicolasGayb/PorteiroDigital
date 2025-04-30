@@ -76,9 +76,9 @@ def painel():
     elif tipo == 'Condomino':
         return redirect(url_for('painel_condomino'))
     elif tipo == 'Administrador':
-        return "Painel do Administrador - Em construção"
-    elif tipo == 'Dono do prédio':
-        return "Painel do Dono do Prédio - Em construção"
+        return redirect(url_for('painel_admin'))
+    elif tipo == 'Proprietario':
+        return redirect(url_for('painel_dono'))
     else:
         return "Tipo de usuário não reconhecido"
 
@@ -92,6 +92,15 @@ def painel_zelador():
 def painel_condomino():
     return "Painel do Condômino - Aqui ele pode visualizar entregas."
 
+# Painel do dono do condomínio
+@app.route('/painel/dono')
+def painel_dono():
+    return "Painel do Dono do Prédio - Aqui ele pode gerenciar o condomínio."
+
+# Painel do administrador
+@app.route('/painel/admin')
+def painel_admin():
+    return "Painel do Administrador - Aqui ele pode gerenciar usuários e configurações."
 # Logout
 @app.route('/logout')
 def logout():
