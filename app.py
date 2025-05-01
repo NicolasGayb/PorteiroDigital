@@ -112,9 +112,8 @@ def painel_dono():
 # Painel do Administrador
 @app.route('/painel/admin')
 def painel_admin():
-    usuarios = User.query.all()  # Obtém todos os usuários do banco
+    usuarios = Usuario.query.all()  # Obtém todos os usuários do banco
     return render_template('painel_admin.html', usuarios=usuarios)
-
 
 # Rota para logout
 @app.route('/logout')
