@@ -115,6 +115,19 @@ def painel_admin():
     usuarios = Usuario.query.all()  # Obtém todos os usuários do banco
     return render_template('painel_admin.html', usuarios=usuarios)
 
+# Rota para editar usuário (apenas para o administrador)
+@app.route('/atualizar_usuario/<int:id>', methods=['POST'])
+def atualizar_usuario(id):
+    usuario = Usuario.query.get_or_404(id)
+    data = request.json  # Recebe os dados enviados pelo JavaScript
+
+    if usuario and data['campo'] in ['nome', 'email', 'tipo']:
+        setattr(usuario, data['campo'], data['valor'])  # Atualiza qualquer campo enviado
+        db.session.commit()
+        return f"{data['campo'].capitalize()} atualizado com sucesso!", 200
+    else:
+        return "Usuário não encontrado ou campo inválido", 404
+
 # Rota para logout
 @app.route('/logout')
 def logout():
