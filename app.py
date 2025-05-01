@@ -62,7 +62,7 @@ def register():
         # Verificação de usuário já existente
         usuario_existente = Usuario.query.filter_by(email=email).first()
         if usuario_existente:
-            flash("Já existe um usuário com esse email.", "warning")
+            flash("Já existe um usuário com esse email, favor realize o login com suas credenciais.", "warning")
             return redirect(url_for('register'))
 
         # Criação do novo usuário
@@ -92,7 +92,7 @@ def painel():
     elif tipo == 'Dono do prédio':
         return redirect(url_for('painel_dono'))
     else:
-        return "Tipo de usuário não reconhecido"
+        return "Tipo de usuário não reconhecido, favor entre em contato com o administrador do sistema."
 
 # Painel do Zelador
 @app.route('/painel/zelador')
@@ -112,7 +112,9 @@ def painel_dono():
 # Painel do Administrador
 @app.route('/painel/admin')
 def painel_admin():
-    return render_template('painel_admin.html')
+    usuarios = User.query.all()  # Obtém todos os usuários do banco
+    return render_template('painel_admin.html', usuarios=usuarios)
+
 
 # Rota para logout
 @app.route('/logout')
