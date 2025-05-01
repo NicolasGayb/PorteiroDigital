@@ -41,15 +41,18 @@
                 <!-- Campo de Tipo como um select dropdown -->
                 <td>
                   <select class="form-select form-select-sm" id="tipo-{{ user.id }}" disabled>
-                    <option value="Admin" {% if user.tipo == 'Admin' %}selected{% endif %}>Admin</option>
-                    <option value="User" {% if user.tipo == 'User' %}selected{% endif %}>User</option>
+                    <option value="Administrador" {% if user.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
+                    <option value="Proprietario" {% if user.tipo == 'Proprietario' %}selected{% endif %}>Proprietário</option>
+                    <option value="Condomino" {% if user.tipo == 'Condomino' %}selected{% endif %}>Condomino</option>
+                    <option value="Zelador" {% if user.tipo == 'Zelador' %}selected{% endif %}>Zelador</option>
                   </select>
                 </td>
           
                 <!-- Botões de ação: Editar, Salvar e Excluir -->
                 <td>
-                  <button class="btn btn-sm btn-warning" onclick="editarUsuario({{ user.id }})">Editar</button>
-                  <button class="btn btn-sm btn-success d-none" onclick="salvarUsuario({{ user.id }})" id="salvar-{{ user.id }}">Salvar</button>
+                  <button class="btn btn-sm btn-warning" id="editar-{{ user.id }}" onclick="editarUsuario({{ user.id }})">Editar</button>
+                  <button class="btn btn-sm btn-success d-none" id="salvar-{{ user.id }}" onclick="salvarUsuario({{ user.id }})">Salvar</button>
+                  <button class="btn btn-sm btn-secondary d-none" id="cancelar-{{ user.id }}" onclick="cancelarEdicao({{ user.id }})">Cancelar</button>
                   <a href="/excluir/{{ user.id }}" class="btn btn-sm btn-danger">Excluir</a>
                 </td>
               </tr>
