@@ -26,10 +26,24 @@
           <tbody>
             {% for user in usuarios %}
               <tr>
-                <td>{{ user.nome }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.tipo }}</td>
-                <td><a href="/editar/{{ user.id }}" class="btn btn-sm btn-warning">Editar</a> <a href="/excluir/{{ user.id }}" class="btn btn-sm btn-danger">Excluir</a></td>
+                <td>
+                  <input type="text" class="form-control form-control-sm" value="{{ user.nome }}" 
+                         onchange="atualizarUsuario({{ user.id }}, 'nome', this.value)">
+                </td>
+                <td>
+                  <input type="email" class="form-control form-control-sm" value="{{ user.email }}" 
+                         onchange="atualizarUsuario({{ user.id }}, 'email', this.value)">
+                </td>
+                <td>
+                  <select class="form-select form-select-sm" onchange="atualizarUsuario({{ user.id }}, 'tipo', this.value)">
+                    <option value="Admin" {% if user.tipo == 'Admin' %}selected{% endif %}>Admin</option>
+                    <option value="User" {% if user.tipo == 'User' %}selected{% endif %}>User</option>
+                  </select>
+                </td>
+                <td>
+                  <a href="/editar/{{ user.id }}" class="btn btn-sm btn-warning">Editar</a>
+                  <a href="/excluir/{{ user.id }}" class="btn btn-sm btn-danger">Excluir</a>
+                </td>
               </tr>
             {% endfor %}
           </tbody>
