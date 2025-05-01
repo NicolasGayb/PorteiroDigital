@@ -25,27 +25,36 @@
           </thead>
           <tbody>
             {% for user in usuarios %}
-              <tr>
+              <tr id="linha-{{ user.id }}">
+                <!-- Campo de Nome com 'disabled' para evitar edição direta -->
                 <td>
-                  <input type="text" class="form-control form-control-sm" value="{{ user.nome }}" 
-                         onchange="atualizarUsuario({{ user.id }}, 'nome', this.value)">
+                  <input type="text" class="form-control form-control-sm" 
+                         value="{{ user.nome }}" id="nome-{{ user.id }}" disabled>
                 </td>
+          
+                <!-- Campo de Email -->
                 <td>
-                  <input type="email" class="form-control form-control-sm" value="{{ user.email }}" 
-                         onchange="atualizarUsuario({{ user.id }}, 'email', this.value)">
+                  <input type="email" class="form-control form-control-sm" 
+                         value="{{ user.email }}" id="email-{{ user.id }}" disabled>
                 </td>
+          
+                <!-- Campo de Tipo como um select dropdown -->
                 <td>
-                  <select class="form-select form-select-sm" onchange="atualizarUsuario({{ user.id }}, 'tipo', this.value)">
+                  <select class="form-select form-select-sm" id="tipo-{{ user.id }}" disabled>
                     <option value="Admin" {% if user.tipo == 'Admin' %}selected{% endif %}>Admin</option>
                     <option value="User" {% if user.tipo == 'User' %}selected{% endif %}>User</option>
                   </select>
                 </td>
+          
+                <!-- Botões de ação: Editar, Salvar e Excluir -->
                 <td>
-                  <a href="/editar/{{ user.id }}" class="btn btn-sm btn-warning">Editar</a>
+                  <button class="btn btn-sm btn-warning" onclick="editarUsuario({{ user.id }})">Editar</button>
+                  <button class="btn btn-sm btn-success d-none" onclick="salvarUsuario({{ user.id }})" id="salvar-{{ user.id }}">Salvar</button>
                   <a href="/excluir/{{ user.id }}" class="btn btn-sm btn-danger">Excluir</a>
                 </td>
               </tr>
             {% endfor %}
+          </tbody>
           </tbody>
         </table>
       </div>

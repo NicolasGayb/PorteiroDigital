@@ -118,18 +118,19 @@ def painel_admin():
 # Rota para editar usuário (apenas para o administrador)
 @app.route('/atualizar_usuario/<int:id>', methods=['POST'])
 def atualizar_usuario(id):
-    usuario = Usuario.query.get_or_404(id)
+    usuario = Usuario.query.get_or_404(id)  # Busca usuário no banco
     data = request.json  # Recebe os dados enviados pelo JavaScript
 
+    # Verifica se usuário existe e os dados enviados são válidos
     if usuario:
-        usuario.nome = data.get("nome", usuario.nome)
-        usuario.email = data.get("email", usuario.email)
-        usuario.tipo = data.get("tipo", usuario.tipo)
+        usuario.nome = data.get("nome", usuario.nome)  # Atualiza nome, se enviado
+        usuario.email = data.get("email", usuario.email)  # Atualiza email
+        usuario.tipo = data.get("tipo", usuario.tipo)  # Atualiza tipo
 
-        db.session.commit()
-        return "Usuário atualizado com sucesso!", 200
+        db.session.commit()  # Salva mudanças no banco de dados
+        return "Usuário atualizado com sucesso!", 200  # Retorna mensagem de sucesso
     else:
-        return "Usuário não encontrado", 404
+        return "Usuário não encontrado", 404  # Retorna erro se usuário não existe
 
 # Rota para logout
 @app.route('/logout')
