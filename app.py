@@ -121,12 +121,15 @@ def atualizar_usuario(id):
     usuario = Usuario.query.get_or_404(id)
     data = request.json  # Recebe os dados enviados pelo JavaScript
 
-    if usuario and data['campo'] in ['nome', 'email', 'tipo']:
-        setattr(usuario, data['campo'], data['valor'])  # Atualiza qualquer campo enviado
+    if usuario:
+        usuario.nome = data.get("nome", usuario.nome)
+        usuario.email = data.get("email", usuario.email)
+        usuario.tipo = data.get("tipo", usuario.tipo)
+
         db.session.commit()
-        return f"{data['campo'].capitalize()} atualizado com sucesso!", 200
+        return "Usuário atualizado com sucesso!", 200
     else:
-        return "Usuário não encontrado ou campo inválido", 404
+        return "Usuário não encontrado", 404
 
 # Rota para logout
 @app.route('/logout')
