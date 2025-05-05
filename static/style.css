@@ -1,31 +1,26 @@
 /* Configuração geral */
 body {
-  margin: 0;
   font-family: 'Poppins', sans-serif;
-  background-color: #f5f5f5;
+  background-color: #f4f4f4;
   color: #333;
 }
 
 /* Barra de navegação */
 .navbar {
-  padding: 10px 0;
-  background-color: #2c3e50;
+  padding: 15px 0;
+  background-color: #222;
 }
 
 .navbar-brand img {
-  width: 120px;
+  width: 140px;
 }
 
-.d-flex.gap-3 .btn {
-  font-weight: bold;
-}
-
-/* Hero com fundo responsivo */
+/* Hero com fundo refinado */
 .hero {
   position: relative;
   background-size: cover;
   background-position: center;
-  height: 75vh;
+  height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,10 +29,10 @@ body {
   padding: 50px 0;
 }
 
-/* Cards com efeito ao passar o mouse */
+/* Cards Premium */
 .card {
   transition: transform 0.3s ease-in-out;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -45,7 +40,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Botões */
+/* Botões elegantes */
 .btn-success {
   background-color: #27ae60;
   border: none;
@@ -67,9 +62,9 @@ body {
   color: #333;
 }
 
-/* Rodapé */
+/* Rodapé refinado */
 .footer {
-  background-color: #2c3e50;
+  background-color: #222;
   color: white;
   text-align: center;
   padding: 15px;
@@ -83,13 +78,13 @@ body {
 /* Responsividade */
 @media (max-width: 768px) {
   .hero {
-    height: 50vh;
-    text-align: center;
-    padding: 30px;
+      height: 50vh;
+      text-align: center;
+      padding: 30px;
   }
 
   .d-flex.gap-3 {
-    flex-direction: column;
+      flex-direction: column;
   }
 }
 
