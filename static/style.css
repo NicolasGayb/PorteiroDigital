@@ -1,3 +1,4 @@
+/* Configuração geral */
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
@@ -5,35 +6,56 @@ body {
   color: #333;
 }
 
+/* Botões */
 .btn-primary {
-    background-color: #007bff;
-    border: none;
+  background-color: #007bff;
+  border: none;
+  transition: background 0.3s;
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
+/* Cartões */
 .card {
-    border-radius: 12px;
+  border-radius: 12px;
+  transition: transform 0.3s ease-in-out;
 }
 
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Centralização para telas grandes */
 .container-condomino {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 20px 15px 90px;
+  padding: 20px;
 }
 
+/* Saudação */
 .greeting {
   font-size: 24px;
+  font-weight: bold;
   margin-bottom: 15px;
 }
 
-/* Hero com fundo animado */
+/* Navbar com logo */
+.navbar {
+  padding: 10px 0;
+  background-color: #343a40;
+}
+
+.navbar-brand img {
+  width: 120px;
+}
+
+/* Hero Section */
 .hero {
   position: relative;
   background: url("../img/background.jpg") center/cover no-repeat;
-  height: 70vh;
+  height: 75vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,34 +74,7 @@ body {
   animation: fadeInUp 1s ease-in-out;
 }
 
-/* Cards com efeito ao passar o mouse */
-.card {
-  transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-/* Footer */
-.footer {
-  background-color: #343a40;
-  color: white;
-  padding: 10px 0;
-}
-
-/* Animação suave */
-@keyframes fadeInUp {
-  from {
-      opacity: 0;
-      transform: translateY(20px);
-  }
-  to {
-      opacity: 1;
-      transform: translateY(0);
-  }
-}
-
+/* Destaques */
 .highlight-card {
   background-color: #e0f3ff;
   border-radius: 15px;
@@ -100,6 +95,7 @@ body {
   height: auto;
 }
 
+/* Barra de pesquisa */
 .search-box input {
   width: 100%;
   padding: 12px 15px;
@@ -110,6 +106,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Lista de entregas */
 .entregas-lista {
   display: flex;
   flex-direction: column;
@@ -173,6 +170,7 @@ body {
   color: #dc3545;
 }
 
+/* Menu inferior fixo */
 .menu-inferior {
   position: fixed;
   bottom: 0;
@@ -196,4 +194,41 @@ body {
   color: #007bff;
 }
 
+/* Footer */
+.footer {
+  background-color: #343a40;
+  color: white;
+  text-align: center;
+  padding: 15px;
+}
 
+/* Responsividade */
+@media (max-width: 768px) {
+  .hero {
+    height: 50vh;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .menu-inferior {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px 0;
+  }
+
+  .menu-item {
+    font-size: 18px;
+  }
+}
+
+/* Animação suave */
+@keyframes fadeInUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
