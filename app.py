@@ -29,6 +29,19 @@ class Usuario(db.Model):
         self.tipo = tipo
         self.destinatario = nome  # Define automaticamente
 
+#Modelo de encomenda
+class Encomenda(db.Model):
+    __tablename__ = "encomenda"  # Nome exato da tabela no Neon
+
+    codigo = db.Column(db.Integer, primary_key=True)  # SERIAL PRIMARY KEY
+    nome = db.Column(db.String(50), nullable=False)
+    descricao = db.Column(db.String(200), nullable=False)
+    data_entrega = db.Column(db.Date, nullable=False)
+    remetente = db.Column(db.String(50))
+    tamanho = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(30), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))  # Relacionado a Usuario
+
 
 # Rota inicial - Página de marketing com botão de login/registro
 @app.route('/')
@@ -117,10 +130,10 @@ def painel_condomino():
 
     usuario = Usuario.query.get(session['usuario_id'])
 
-    # Supondo que temos uma tabela de encomendas no banco de dados
-    encomendas = encomenda.query.filter_by(usuario_id=usuario.id).all()
+    # Busca as encomendas do usuário logado
+    encomendas = Encomenda.query.filter_by(usuario_id=usuario.id).all()
 
-    return render_template('painel_condomino.html', usuario=usuario, encomendas=encomenda)
+    return render_template('painel_condomino.html', usuario=usuario, encomendas=encomendas)
 
 # Painel do Dono do Prédio
 @app.route('/painel/dono')
