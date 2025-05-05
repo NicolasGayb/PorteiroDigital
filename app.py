@@ -118,7 +118,7 @@ def painel_condomino():
     usuario = Usuario.query.get(session['usuario_id'])
 
     # Supondo que temos uma tabela de encomendas no banco de dados
-    encomendas = Encomenda.query.filter_by(usuario_id=usuario.id).all()
+    encomendas = encomendas.query.filter_by(usuario_id=usuario.id).all()
 
     return render_template('painel_condomino.html', usuario=usuario, encomendas=encomendas)
 
