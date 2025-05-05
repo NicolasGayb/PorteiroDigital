@@ -19,6 +19,16 @@ class Usuario(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
+    destinatario = db.Column(db.String(100), nullable=False)  # Destinatário será sempre igual ao nome completo
+
+    # Garante que destinatario sempre seja igual ao nome ao criar ou editar um usuário
+    def __init__(self, nome, email, senha, tipo):
+        self.nome = nome
+        self.email = email
+        self.senha = senha
+        self.tipo = tipo
+        self.destinatario = nome  # Define automaticamente
+
 
 # Rota inicial - Página de marketing com botão de login/registro
 @app.route('/')
@@ -121,11 +131,12 @@ def atualizar_usuario(id):
     usuario = Usuario.query.get_or_404(id)  # Busca usuário no banco
     data = request.json  # Recebe os dados enviados pelo JavaScript
 
-    # Verifica se usuário existe e os dados enviados são válidos
+    # Atualiza os dados e garante que o destinatário seja sempre igual ao nome
     if usuario:
         usuario.nome = data.get("nome", usuario.nome)  # Atualiza nome, se enviado
         usuario.email = data.get("email", usuario.email)  # Atualiza email
         usuario.tipo = data.get("tipo", usuario.tipo)  # Atualiza tipo
+        usuario.destinatario = usuario.nome  # Mantém destinatário igual ao nome
 
         db.session.commit()  # Salva mudanças no banco de dados
         return "Usuário atualizado com sucesso!", 200  # Retorna mensagem de sucesso
