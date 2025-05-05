@@ -112,7 +112,15 @@ def painel_zelador():
 # Painel do Condômino
 @app.route('/painel/condomino')
 def painel_condomino():
-    return render_template('painel_condomino.html')
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
+    usuario = Usuario.query.get(session['usuario_id'])
+
+    # Supondo que temos uma tabela de encomendas no banco de dados
+    encomendas = Encomenda.query.filter_by(usuario_id=usuario.id).all()
+
+    return render_template('painel_condomino.html', usuario=usuario, encomendas=encomendas)
 
 # Painel do Dono do Prédio
 @app.route('/painel/dono')
