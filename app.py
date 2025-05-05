@@ -56,11 +56,15 @@ def login():
         senha = request.form['senha']
 
         usuario = Usuario.query.filter_by(email=email).first()
+
         if usuario and check_password_hash(usuario.senha, senha):
             session['usuario_id'] = usuario.id
             session['tipo'] = usuario.tipo
 
-            flash("Login realizado com sucesso!", "success")
+            if not session.get("flash_login"):  # Evita repetição de mensagens
+                flash("Login realizado com sucesso!", "success")
+                session["flash_login"] = True  # Marca que a mensagem foi exibida
+
             return redirect(url_for('painel'))
         else:
             flash("Credenciais inválidas", "danger")
