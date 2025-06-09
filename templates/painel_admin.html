@@ -39,10 +39,10 @@
       </div>
       <!-- Usuário logado -->
       <div class="d-flex align-items-center gap-2 px-4 pb-4">
-        <span class="rounded-circle bg-light d-flex justify-content-center align-items-center" style="width:36px; height:36px; font-size:1.1rem; color:#888;">SA</span>
+        <span class="rounded-circle bg-light d-flex justify-content-center align-items-center" style="width:36px; height:36px; font-size:1.1rem; color:#888;">{{ usuario.nome[0:2]|upper }}</span>
         <div>
-          <div style="font-size:0.95rem;">Nicolas Gabriel Rodrigues</div>
-          <div class="text-muted" style="font-size:0.85rem;">Administrador (SuperAdmin)</div>
+          <div style="font-size:0.95rem;">{{ usuario.nome }}</div>
+          <div class="text-muted" style="font-size:0.85rem;">{{ usuario.tipo }}</div>
         </div>
       </div>
       <div class="px-4 pb-4">

@@ -150,8 +150,11 @@ def painel_dono():
 # Painel do Administrador
 @app.route('/painel/admin')
 def painel_admin():
-    usuarios = Usuario.query.all()  # Obtém todos os usuários do banco
-    return render_template('painel_admin.html', usuarios=usuarios)
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    usuarios = Usuario.query.all()
+    return render_template('painel_admin.html', usuarios=usuarios, usuario=usuario)
 
 # Rota para editar usuário (apenas para o administrador)
 @app.route('/atualizar_usuario/<int:id>', methods=['POST'])

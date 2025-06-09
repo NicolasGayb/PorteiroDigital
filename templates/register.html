@@ -13,11 +13,11 @@
   <div class="container d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
     <div class="text-center mb-4">
       <i class="bi bi-building" style="font-size: 2.5rem; color: #4da3ff;"></i>
-      <h1 class="fw-bold" style="color: #4da3ff; font-size: 2rem;">Portaria Link</h1>
+      <h1 class="fw-bold" style="color: #4da3ff; font-size: 2rem;">Porteiro Digital</h1>
     </div>
-    <div class="bg-white p-4 rounded-4 shadow-sm" style="width: 100%; max-width: 400px;">
-      <h4 class="fw-bold mb-1">Criar uma Conta</h4>
-      <p class="text-muted mb-4" style="font-size: 0.98rem;">Cadastre-se para acessar o Portaria Link.</p>
+    <div class="bg-white p-4 rounded-4 shadow-sm" style="width: 100%; max-width: 430px;">
+      <h3 class="fw-bold mb-1">Criar uma Conta</h3>
+      <p class="text-muted mb-4" style="font-size: 0.98rem;">Cadastre-se para acessar o Porteiro Digital.</p>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -32,7 +32,7 @@
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">E-mail</label>
-          <input type="email" class="form-control rounded-3 bg-light" id="email" name="email" placeholder="voce@exemplo.com" required>
+          <input type="email" class="form-control rounded-3 bg-light" id="email" name="email" placeholder="email@exemplo.com" required>
         </div>
         <div class="mb-3">
           <label for="senha" class="form-label">Senha</label>
