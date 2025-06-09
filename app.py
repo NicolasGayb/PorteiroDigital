@@ -202,8 +202,9 @@ def logout():
 def admin_usuarios():
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
     usuarios = Usuario.query.all()
-    return render_template('usuarios_admin.html', usuarios=usuarios)
+    return render_template('usuarios_admin.html', usuarios=usuarios, usuario=usuario)
 
 @app.route('/admin/condominios', methods=['GET', 'POST'])
 def admin_condominios():
