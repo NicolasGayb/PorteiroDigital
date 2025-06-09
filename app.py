@@ -75,11 +75,14 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        # Log para depuração
+        print('DEBUG REGISTER FORM:', dict(request.form))
         nome = request.form['nome']
         email = request.form['email']
         senha = request.form['senha']
         confirma = request.form['confirma_senha']
-        tipo = request.form['tipo']  # Tipo de usuário escolhido
+        # Define tipo padrão se não vier do formulário
+        tipo = request.form.get('tipo', 'Condomino')
 
         # Verificação se senhas coincidem
         if senha != confirma:
