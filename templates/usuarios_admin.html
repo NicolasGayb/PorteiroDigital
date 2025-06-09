@@ -32,42 +32,42 @@
                 </tr>
               </thead>
               <tbody>
-                {% for usuario in usuarios %}
+                {% for user in usuarios %}
                 <tr>
-                  <td>{{ usuario.nome }}</td>
-                  <td>{{ usuario.email }}</td>
+                  <td>{{ user.nome }}</td>
+                  <td>{{ user.email }}</td>
                   <td>
-                    {% if usuario.tipo == 'Administrador' %}Administrador{% elif usuario.tipo == 'Dono do prédio' %}Proprietário{% elif usuario.tipo == 'Zelador' %}Porteiro{% elif usuario.tipo == 'Condomino' %}Morador{% else %}{{ usuario.tipo }}{% endif %}
+                    {% if user.tipo == 'Administrador' %}Administrador{% elif user.tipo == 'Dono do prédio' %}Proprietário{% elif user.tipo == 'Zelador' %}Porteiro{% elif user.tipo == 'Condomino' %}Morador{% else %}{{ user.tipo }}{% endif %}
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario{{ usuario.id }}"><i class="bi bi-pencil"></i> Editar</button>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario{{ user.id }}"><i class="bi bi-pencil"></i> Editar</button>
                   </td>
                 </tr>
                 <!-- Modal de edição -->
-                <div class="modal fade" id="modalEditarUsuario{{ usuario.id }}" tabindex="-1" aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
+                <div class="modal fade" id="modalEditarUsuario{{ user.id }}" tabindex="-1" aria-labelledby="modalLabel{{ user.id }}" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
-                      <form method="post" action="/atualizar_usuario/{{ usuario.id }}" class="editar-usuario-form">
+                      <form method="post" action="/atualizar_usuario/{{ user.id }}" class="editar-usuario-form">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="modalLabel{{ usuario.id }}">Editar Usuário</h5>
+                          <h5 class="modal-title" id="modalLabel{{ user.id }}">Editar Usuário</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                         </div>
                         <div class="modal-body">
                           <div class="mb-3">
                             <label class="form-label">Nome</label>
-                            <input type="text" class="form-control" name="nome" value="{{ usuario.nome }}" required>
+                            <input type="text" class="form-control" name="nome" value="{{ user.nome }}" required>
                           </div>
                           <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" value="{{ usuario.email }}" required>
+                            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
                           </div>
                           <div class="mb-3">
                             <label class="form-label">Tipo</label>
                             <select class="form-select" name="tipo" required>
-                              <option value="Administrador" {% if usuario.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
-                              <option value="Dono do prédio" {% if usuario.tipo == 'Dono do prédio' %}selected{% endif %}>Proprietário</option>
-                              <option value="Zelador" {% if usuario.tipo == 'Zelador' %}selected{% endif %}>Porteiro</option>
-                              <option value="Condomino" {% if usuario.tipo == 'Condomino' %}selected{% endif %}>Morador</option>
+                              <option value="Administrador" {% if user.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
+                              <option value="Dono do prédio" {% if user.tipo == 'Dono do prédio' %}selected{% endif %}>Proprietário</option>
+                              <option value="Zelador" {% if user.tipo == 'Zelador' %}selected{% endif %}>Porteiro</option>
+                              <option value="Condomino" {% if user.tipo == 'Condomino' %}selected{% endif %}>Morador</option>
                             </select>
                           </div>
                           <div class="mb-3">
