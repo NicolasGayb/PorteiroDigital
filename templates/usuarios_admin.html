@@ -1,0 +1,128 @@
+<!-- usuarios_admin.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Usuários</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body style="background: #f4f4f4;">
+  <div class="d-flex" style="min-height: 100vh;">
+    <!-- Sidebar Lateral -->
+    <nav class="bg-white border-end shadow-sm d-flex flex-column justify-content-between" style="width: 260px; min-height: 100vh; position:relative;">
+      <div>
+        <div class="d-flex align-items-center gap-2 px-4 pt-4 pb-3">
+          <i class="bi bi-building" style="font-size: 2rem; color: #4da3ff;"></i>
+          <span class="fw-bold" style="color: #4da3ff; font-size: 1.5rem;">Portaria Link</span>
+        </div>
+        <ul class="nav flex-column mt-3">
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/painel/admin"><i class="bi bi-house-door me-2"></i>Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="#"><i class="bi bi-people me-2"></i>Gerenciar Condomínios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="#"><i class="bi bi-gear me-2"></i>Config. da Plataforma</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="#"><i class="bi bi-shield-check me-2"></i>Detecção de Anomalias</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active fw-semibold" href="/admin/usuarios" style="color: #4da3ff;"><i class="bi bi-person-lines-fill me-2"></i>Editar Usuários</a>
+          </li>
+        </ul>
+      </div>
+      <div class="d-flex align-items-center gap-2 px-4 pb-4">
+        <span class="rounded-circle bg-light d-flex justify-content-center align-items-center" style="width:36px; height:36px; font-size:1.1rem; color:#888;">SA</span>
+        <div>
+          <div style="font-size:0.95rem;">Administrador</div>
+          <div class="text-muted" style="font-size:0.85rem;">SuperAdmin</div>
+        </div>
+      </div>
+      <div class="px-4 pb-4">
+        <a href="/logout" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-2"></i>Sair</a>
+      </div>
+    </nav>
+    <!-- Conteúdo principal -->
+    <main class="flex-grow-1 px-4 py-4">
+      <div class="mb-4">
+        <h2 class="fw-bold mb-1" style="font-size:2rem;">Gerenciar Usuários</h2>
+        <div class="text-muted" style="font-size:1.1rem;">Edite, altere permissões ou redefina senhas dos usuários cadastrados.</div>
+      </div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Tipo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                  <td>{{ usuario.nome }}</td>
+                  <td>{{ usuario.email }}</td>
+                  <td>{{ usuario.tipo }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario{{ usuario.id }}"><i class="bi bi-pencil"></i> Editar</button>
+                  </td>
+                </tr>
+                <!-- Modal de edição -->
+                <div class="modal fade" id="modalEditarUsuario{{ usuario.id }}" tabindex="-1" aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" action="/atualizar_usuario/{{ usuario.id }}" class="editar-usuario-form">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="modalLabel{{ usuario.id }}">Editar Usuário</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label class="form-label">Nome</label>
+                            <input type="text" class="form-control" name="nome" value="{{ usuario.nome }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ usuario.email }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" name="tipo" required>
+                              <option value="Administrador" {% if usuario.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
+                              <option value="Dono do prédio" {% if usuario.tipo == 'Dono do prédio' %}selected{% endif %}>Dono do prédio</option>
+                              <option value="Zelador" {% if usuario.tipo == 'Zelador' %}selected{% endif %}>Zelador</option>
+                              <option value="Condomino" {% if usuario.tipo == 'Condomino' %}selected{% endif %}>Condomino</option>
+                            </select>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">Nova Senha (opcional)</label>
+                            <input type="password" class="form-control" name="nova_senha" placeholder="Deixe em branco para não alterar">
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

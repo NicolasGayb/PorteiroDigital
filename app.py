@@ -156,20 +156,28 @@ def painel_admin():
 # Rota para editar usuário (apenas para o administrador)
 @app.route('/atualizar_usuario/<int:id>', methods=['POST'])
 def atualizar_usuario(id):
-    usuario = Usuario.query.get_or_404(id)  # Busca usuário no banco
-    data = request.json  # Recebe os dados enviados pelo JavaScript
-
-    # Atualiza os dados e garante que o destinatário seja sempre igual ao nome
-    if usuario:
-        usuario.nome = data.get("nome", usuario.nome)  # Atualiza nome, se enviado
-        usuario.email = data.get("email", usuario.email)  # Atualiza email
-        usuario.tipo = data.get("tipo", usuario.tipo)  # Atualiza tipo
-        usuario.destinatario = usuario.nome  # Mantém destinatário igual ao nome
-
-        db.session.commit()  # Salva mudanças no banco de dados
-        return "Usuário atualizado com sucesso!", 200  # Retorna mensagem de sucesso
+    usuario = Usuario.query.get_or_404(id)
+    # Suporte tanto para JSON quanto para formulário
+    if request.is_json:
+        data = request.json
+        nome = data.get("nome", usuario.nome)
+        email = data.get("email", usuario.email)
+        tipo = data.get("tipo", usuario.tipo)
+        nova_senha = data.get("nova_senha", None)
     else:
-        return "Usuário não encontrado", 404  # Retorna erro se usuário não existe
+        nome = request.form.get("nome", usuario.nome)
+        email = request.form.get("email", usuario.email)
+        tipo = request.form.get("tipo", usuario.tipo)
+        nova_senha = request.form.get("nova_senha", None)
+    usuario.nome = nome
+    usuario.email = email
+    usuario.tipo = tipo
+    usuario.destinatario = nome
+    if nova_senha:
+        usuario.senha = generate_password_hash(nova_senha)
+    db.session.commit()
+    flash("Usuário atualizado com sucesso!", "success")
+    return redirect(url_for('painel_admin'))
 
 # Rota para logout
 @app.route('/logout')
@@ -177,6 +185,14 @@ def logout():
     session.clear()
     flash("Você saiu da sessão.", "info")
     return redirect(url_for('login'))
+
+# Rota para administração de usuários (exclusiva para administradores)
+@app.route('/admin/usuarios')
+def admin_usuarios():
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuarios = Usuario.query.all()
+    return render_template('usuarios_admin.html', usuarios=usuarios)
 
 # Inicialização da aplicação
 if __name__ == '__main__':
