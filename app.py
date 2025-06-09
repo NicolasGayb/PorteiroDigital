@@ -197,6 +197,27 @@ def admin_usuarios():
     usuarios = Usuario.query.all()
     return render_template('usuarios_admin.html', usuarios=usuarios)
 
+@app.route('/admin/condominios')
+def admin_condominios():
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    return render_template('admin_condominios.html', usuario=usuario)
+
+@app.route('/admin/configuracoes')
+def admin_configuracoes():
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    return render_template('admin_configuracoes.html', usuario=usuario)
+
+@app.route('/admin/anomalias')
+def admin_anomalias():
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    return render_template('admin_anomalias.html', usuario=usuario)
+
 # Inicialização da aplicação
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
