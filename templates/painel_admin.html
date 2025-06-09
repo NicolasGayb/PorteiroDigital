@@ -36,17 +36,18 @@
             <a class="nav-link text-dark" href="/admin/usuarios"><i class="bi bi-person-lines-fill me-2"></i>Editar Usuários</a>
           </li>
         </ul>
-      </div>
-      <!-- Usuário logado -->
-      <div class="d-flex align-items-center gap-2 px-4 pb-4">
-        <span class="rounded-circle bg-light d-flex justify-content-center align-items-center" style="width:36px; height:36px; font-size:1.1rem; color:#888;">{{ usuario.nome[0:2]|upper }}</span>
-        <div>
-          <div style="font-size:0.95rem;">{{ usuario.nome }}</div>
-          <div class="text-muted" style="font-size:0.85rem;">{{ usuario.tipo }}</div>
+        <div class="flex-grow-1"></div>
+        <!-- Usuário logado -->
+        <div class="d-flex align-items-center gap-2 px-4 pb-2">
+          <span class="rounded-circle bg-light d-flex justify-content-center align-items-center" style="width:36px; height:36px; font-size:1.1rem; color:#888;">{{ usuario.nome[0:2]|upper }}</span>
+          <div>
+            <div style="font-size:0.95rem;">{{ usuario.nome }}</div>
+            <div class="text-muted" style="font-size:0.85rem;">{{ usuario.tipo }}</div>
+          </div>
         </div>
-      </div>
-      <div class="px-4 pb-4">
-        <a href="/logout" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-2"></i>Sair</a>
+        <div class="px-4 pb-4">
+          <a href="/logout" class="btn btn-outline-danger w-100"><i class="bi bi-box-arrow-right me-2"></i>Sair</a>
+        </div>
       </div>
     </nav>
     <!-- Conteúdo principal -->
@@ -138,81 +139,7 @@
           </div>
         </div>
       </div>
-      <!-- Seção de edição de usuários -->
-      <div class="row g-4 mt-4" id="usuarios-section">
-        <div class="col-12">
-          <div class="card border-0 shadow-sm">
-            <div class="card-body">
-              <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill me-2"></i>Editar Usuários</h5>
-              <div class="table-responsive">
-                <table class="table align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Nome</th>
-                      <th>Email</th>
-                      <th>Tipo</th>
-                      <th>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for usuario in usuarios %}
-                    <tr>
-                      <td>{{ usuario.nome }}</td>
-                      <td>{{ usuario.email }}</td>
-                      <td>{{ usuario.tipo }}</td>
-                      <td>
-                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario{{ usuario.id }}"><i class="bi bi-pencil"></i> Editar</button>
-                      </td>
-                    </tr>
-                    <!-- Modal de edição -->
-                    <div class="modal fade" id="modalEditarUsuario{{ usuario.id }}" tabindex="-1" aria-labelledby="modalLabel{{ usuario.id }}" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <form method="post" action="/atualizar_usuario/{{ usuario.id }}" class="editar-usuario-form">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="modalLabel{{ usuario.id }}">Editar Usuário</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                            </div>
-                            <div class="modal-body">
-                              <div class="mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" class="form-control" name="nome" value="{{ usuario.nome }}" required>
-                              </div>
-                              <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" name="email" value="{{ usuario.email }}" required>
-                              </div>
-                              <div class="mb-3">
-                                <label class="form-label">Tipo</label>
-                                <select class="form-select" name="tipo" required>
-                                  <option value="Administrador" {% if usuario.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
-                                  <option value="Dono do prédio" {% if usuario.tipo == 'Dono do prédio' %}selected{% endif %}>Dono do prédio</option>
-                                  <option value="Zelador" {% if usuario.tipo == 'Zelador' %}selected{% endif %}>Zelador</option>
-                                  <option value="Condomino" {% if usuario.tipo == 'Condomino' %}selected{% endif %}>Condomino</option>
-                                </select>
-                              </div>
-                              <div class="mb-3">
-                                <label class="form-label">Nova Senha (opcional)</label>
-                                <input type="password" class="form-control" name="nova_senha" placeholder="Deixe em branco para não alterar">
-                              </div>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Fim edição usuários -->
+      <!-- Fim cards de navegação -->
     </main>
   </div>
   <!-- Bootstrap e ícones -->
