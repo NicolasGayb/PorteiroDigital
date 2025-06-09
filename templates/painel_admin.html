@@ -9,67 +9,133 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body style="background: #f4f4f4;">
-  <div class="container d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
-    <div class="text-center mb-4">
-      <i class="bi bi-building" style="font-size: 2.5rem; color: #4da3ff;"></i>
-      <h1 class="fw-bold" style="color: #4da3ff; font-size: 2rem;">Porteiro Digital</h1>
-    </div>
-    <div class="bg-white p-4 rounded-4 shadow-sm" style="width: 100%; max-width: 900px;">
-      <h3 class="fw-bold mb-3 text-center" style="color: #222;">Painel do Administrador</h3>
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-          <h5 class="card-title fw-bold">Usuários cadastrados</h5>
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th>Nome</th>
-                  <th>Email</th>
-                  <th>Tipo</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for user in usuarios %}
-                  <tr id="linha-{{ user.id }}">
-                    <!-- Campo de Nome com 'disabled' para evitar edição direta -->
-                    <td>
-                      <input type="text" class="form-control form-control-sm bg-light rounded-3" 
-                             value="{{ user.nome }}" id="nome-{{ user.id }}" disabled>
-                    </td>
-                
-                    <!-- Campo de Email -->
-                    <td>
-                      <input type="email" class="form-control form-control-sm bg-light rounded-3" 
-                             value="{{ user.email }}" id="email-{{ user.id }}" disabled>
-                    </td>
-                
-                    <!-- Campo de Tipo como um select dropdown -->
-                    <td>
-                      <select class="form-select form-select-sm bg-light rounded-3" id="tipo-{{ user.id }}" disabled>
-                        <option value="Administrador" {% if user.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
-                        <option value="Proprietario" {% if user.tipo == 'Proprietario' %}selected{% endif %}>Proprietário</option>
-                        <option value="Condomino" {% if user.tipo == 'Condomino' %}selected{% endif %}>Condomino</option>
-                        <option value="Zelador" {% if user.tipo == 'Zelador' %}selected{% endif %}>Zelador</option>
-                      </select>
-                    </td>
-                
-                    <!-- Botões de ação: Editar, Salvar e Excluir -->
-                    <td>
-                      <button class="btn btn-sm btn-warning" id="editar-{{ user.id }}" onclick="editarUsuario({{ user.id }})">Editar</button>
-                      <button class="btn btn-sm btn-success d-none" id="salvar-{{ user.id }}" onclick="salvarUsuario({{ user.id }})">Salvar</button>
-                      <button class="btn btn-sm btn-secondary d-none" id="cancelar-{{ user.id }}" onclick="cancelarEdicao({{ user.id }})">Cancelar</button>
-                      <a href="/excluir/{{ user.id }}" class="btn btn-sm btn-danger">Excluir</a>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+  <div class="d-flex" style="min-height: 100vh;">
+    <!-- Sidebar Lateral -->
+    <nav class="bg-white border-end shadow-sm d-flex flex-column justify-content-between" style="width: 260px; min-height: 100vh; position:relative;">
+      <div>
+        <!-- Logo e título -->
+        <div class="d-flex align-items-center gap-2 px-4 pt-4 pb-3">
+          <i class="bi bi-building" style="font-size: 2rem; color: #4da3ff;"></i>
+          <span class="fw-bold" style="color: #4da3ff; font-size: 1.5rem;">Portaria Link</span>
+        </div>
+        <!-- Menu de navegação -->
+        <ul class="nav flex-column mt-3">
+          <li class="nav-item">
+            <a class="nav-link active fw-semibold" href="#" style="color: #4da3ff;"><i class="bi bi-house-door me-2"></i>Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="#"><i class="bi bi-people me-2"></i>Gerenciar Condomínios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="#"><i class="bi bi-gear me-2"></i>Config. da Plataforma</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="#"><i class="bi bi-shield-check me-2"></i>Detecção de Anomalias</a>
+          </li>
+        </ul>
+      </div>
+      <!-- Usuário logado -->
+      <div class="d-flex align-items-center gap-2 px-4 pb-4">
+        <span class="rounded-circle bg-light d-flex justify-content-center align-items-center" style="width:36px; height:36px; font-size:1.1rem; color:#888;">SA</span>
+        <div>
+          <div style="font-size:0.95rem;">Nicolas Gabriel Rodrigues</div>
+          <div class="text-muted" style="font-size:0.85rem;">Administrador (SuperAdmin)</div>
+        </div>
+      </div>
+    </nav>
+    <!-- Conteúdo principal -->
+    <main class="flex-grow-1 px-4 py-4">
+      <!-- Título e subtítulo -->
+      <div class="mb-4">
+        <h2 class="fw-bold mb-1" style="font-size:2rem;">Visão Geral da Plataforma</h2>
+        <div class="text-muted" style="font-size:1.1rem;">Gerencie condomínios e configurações da plataforma.</div>
+      </div>
+      <!-- Cards de resumo -->
+      <div class="row g-4 mb-3">
+        <!-- Card Resumo Geral -->
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3">Resumo Geral</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="border rounded-3 p-3 text-center">
+                    <div class="text-muted">Total de Entregas Registradas</div>
+                    <div class="fw-bold fs-4">0</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="border rounded-3 p-3 text-center">
+                    <div class="text-muted">Retiradas Pendentes</div>
+                    <div class="fw-bold fs-4">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card Otimize Seu Fluxo -->
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm h-100 d-flex align-items-center justify-content-center text-center" style="min-height:100%;">
+            <div class="card-body">
+              <h5 class="fw-bold mb-2">Otimize Seu Fluxo de Trabalho</h5>
+              <div class="text-muted">Portaria Link simplifica o gerenciamento.</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <!-- Cards de navegação -->
+      <div class="row g-4">
+        <!-- Gerenciar Condomínios -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <h5 class="fw-bold mb-0 flex-grow-1">Gerenciar Condomínios</h5>
+                <i class="bi bi-people text-primary" style="font-size:1.3rem;"></i>
+              </div>
+              <div class="text-muted mb-3">Adicione, edite ou remova condomínios da plataforma.</div>
+              <a href="#" class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                Ir para Gerenciar Condomínios <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- Configurações da Plataforma -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <h5 class="fw-bold mb-0 flex-grow-1">Configurações da Plataforma</h5>
+                <i class="bi bi-diagram-3 text-primary" style="font-size:1.3rem;"></i>
+              </div>
+              <div class="text-muted mb-3">Ajustes globais e configurações do sistema Portaria Link.</div>
+              <a href="#" class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                Ir para Configurações da Plataforma <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- Detectar Anomalias -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <h5 class="fw-bold mb-0 flex-grow-1">Detectar Anomalias</h5>
+                <i class="bi bi-shield-check text-primary" style="font-size:1.3rem;"></i>
+              </div>
+              <div class="text-muted mb-3">Use IA para identificar padrões de entrega incomuns.</div>
+              <a href="#" class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                Ir para Detectar Anomalias <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
+  <!-- Bootstrap e ícones -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
