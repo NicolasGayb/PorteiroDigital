@@ -14,10 +14,144 @@
     {% include 'sidebar_admin.html' %}
     <main class="flex-grow-1 px-4 py-4">
       <div class="mb-4">
-        <h2 class="fw-bold mb-1" style="font-size:2rem;">Gerenciar Condomínios</h2>
-        <div class="text-muted" style="font-size:1.1rem;">Adicione, edite ou remova condomínios da plataforma.</div>
+        <h2 class="fw-bold mb-1" style="font-size:2rem;"><i class="bi bi-people text-primary me-2"></i>Gerenciar Condomínios</h2>
+        <div class="text-muted" style="font-size:1.1rem;">Adicione, visualize e gerencie os condomínios cadastrados na plataforma.</div>
       </div>
-      <div class="alert alert-info">Funcionalidade de gerenciamento de condomínios em desenvolvimento.</div>
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-plus-circle fs-4 text-primary me-2"></i>
+                <h5 class="fw-bold mb-0 flex-grow-1">Cadastrar Novo Condomínio</h5>
+              </div>
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mt-2">{{ message }}</div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <form class="row g-3" method="POST" action="">
+                <div class="col-md-6">
+                  <label class="form-label">Nome do Condomínio</label>
+                  <input type="text" class="form-control" name="nome" placeholder="Digite o nome" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Endereço</label>
+                  <input type="text" class="form-control" name="endereco" placeholder="Digite o endereço" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Cidade</label>
+                  <input type="text" class="form-control" name="cidade" placeholder="Cidade" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Estado</label>
+                  <input type="text" class="form-control" name="estado" placeholder="Estado" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">CEP</label>
+                  <input type="text" class="form-control" name="cep" placeholder="CEP" required>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                  <button type="submit" class="btn btn-primary px-4"><i class="bi bi-plus-lg me-1"></i>Adicionar Condomínio</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-list-ul fs-5 text-primary me-2"></i>
+                <h5 class="fw-bold mb-0 flex-grow-1">Condomínios Cadastrados</h5>
+              </div>
+              <div class="text-muted mb-3">Veja e gerencie todos os condomínios registrados.</div>
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Nome</th>
+                    <th>Endereço</th>
+                    <th>Cidade</th>
+                    <th>Estado</th>
+                    <th>CEP</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if condominios|length == 0 %}
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">Nenhum condomínio cadastrado.</td>
+                  </tr>
+                  {% else %}
+                  {% for cond in condominios %}
+                  <tr>
+                    <td>{{ cond.nome }}</td>
+                    <td>{{ cond.endereco }}</td>
+                    <td>{{ cond.cidade }}</td>
+                    <td>{{ cond.estado }}</td>
+                    <td>{{ cond.cep }}</td>
+                    <td>
+                      <!-- Botão Editar -->
+                      <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarCondominio{{ cond.id }}">
+                        <i class="bi bi-pencil"></i> Editar
+                      </button>
+                      <!-- Botão Excluir -->
+                      <form method="POST" action="/admin/condominios/excluir/{{ cond.id }}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este condomínio?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                          <i class="bi bi-trash"></i> Excluir
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <!-- Modal de edição -->
+                  <div class="modal fade" id="modalEditarCondominio{{ cond.id }}" tabindex="-1" aria-labelledby="modalLabel{{ cond.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <form method="POST" action="/admin/condominios/editar/{{ cond.id }}">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel{{ cond.id }}">Editar Condomínio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="mb-3">
+                              <label class="form-label">Nome</label>
+                              <input type="text" class="form-control" name="nome" value="{{ cond.nome }}" required>
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label">Endereço</label>
+                              <input type="text" class="form-control" name="endereco" value="{{ cond.endereco }}" required>
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label">Cidade</label>
+                              <input type="text" class="form-control" name="cidade" value="{{ cond.cidade }}" required>
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label">Estado</label>
+                              <input type="text" class="form-control" name="estado" value="{{ cond.estado }}" required>
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label">CEP</label>
+                              <input type="text" class="form-control" name="cep" value="{{ cond.cep }}" required>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

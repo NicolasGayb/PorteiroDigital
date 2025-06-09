@@ -42,6 +42,14 @@ class Encomenda(db.Model):
     status = db.Column(db.String(30), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))  # Relacionado a Usuario
 
+# Modelo de Condomínio
+class Condominio(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    endereco = db.Column(db.String(200), nullable=False)
+    cidade = db.Column(db.String(100), nullable=False)
+    estado = db.Column(db.String(50), nullable=False)
+    cep = db.Column(db.String(20), nullable=False)
 
 # Rota inicial - Página de marketing com botão de login/registro
 @app.route('/')
@@ -197,12 +205,61 @@ def admin_usuarios():
     usuarios = Usuario.query.all()
     return render_template('usuarios_admin.html', usuarios=usuarios)
 
-@app.route('/admin/condominios')
+@app.route('/admin/condominios', methods=['GET', 'POST'])
 def admin_condominios():
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
     usuario = Usuario.query.get(session['usuario_id'])
-    return render_template('admin_condominios.html', usuario=usuario)
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        endereco = request.form.get('endereco')
+        cidade = request.form.get('cidade')
+        estado = request.form.get('estado')
+        cep = request.form.get('cep')
+        if not all([nome, endereco, cidade, estado, cep]):
+            flash('Preencha todos os campos.', 'danger')
+        else:
+            novo_condominio = Condominio(nome=nome, endereco=endereco, cidade=cidade, estado=estado, cep=cep)
+            db.session.add(novo_condominio)
+            db.session.commit()
+            flash('Condomínio cadastrado com sucesso!', 'success')
+            return redirect(url_for('admin_condominios'))
+    condominios = Condominio.query.all()
+    return render_template('admin_condominios.html', usuario=usuario, condominios=condominios)
+
+# Editar condomínio
+@app.route('/admin/condominios/editar/<int:id>', methods=['POST'])
+def editar_condominio(id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    condominio = Condominio.query.get_or_404(id)
+    nome = request.form.get('nome')
+    endereco = request.form.get('endereco')
+    cidade = request.form.get('cidade')
+    estado = request.form.get('estado')
+    cep = request.form.get('cep')
+    if not all([nome, endereco, cidade, estado, cep]):
+        flash('Preencha todos os campos para editar.', 'danger')
+    else:
+        condominio.nome = nome
+        condominio.endereco = endereco
+        condominio.cidade = cidade
+        condominio.estado = estado
+        condominio.cep = cep
+        db.session.commit()
+        flash('Condomínio atualizado com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+# Excluir condomínio
+@app.route('/admin/condominios/excluir/<int:id>', methods=['POST'])
+def excluir_condominio(id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    condominio = Condominio.query.get_or_404(id)
+    db.session.delete(condominio)
+    db.session.commit()
+    flash('Condomínio excluído com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
 
 @app.route('/admin/configuracoes')
 def admin_configuracoes():
