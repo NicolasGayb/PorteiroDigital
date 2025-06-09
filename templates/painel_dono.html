@@ -18,7 +18,9 @@
       <h1 class="fw-bold" style="color: #4da3ff; font-size: 2rem;">Porteiro Digital</h1>
     </div>
     <div class="bg-white p-4 rounded-4 shadow-sm" style="width: 100%; max-width: 900px;">
-      <h3 class="fw-bold mb-3 text-center" style="color: #222;">Painel do Dono do Prédio</h3>
+      <h3 class="fw-bold mb-3 text-center" style="color: #222;">Painel do Dono do Prédio
+        {% if usuario.tipo == 'Administrador' %}Administrador{% elif usuario.tipo == 'Dono do prédio' %}Proprietário{% elif usuario.tipo == 'Zelador' %}Porteiro{% elif usuario.tipo == 'Condomino' %}Morador{% else %}{{ usuario.tipo }}{% endif %}
+      </h3>
       <div class="row">
         <div class="col-md-6 mb-3">
           <div class="card border-0 shadow-sm h-100">

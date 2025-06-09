@@ -18,6 +18,9 @@
     </div>
     <div class="bg-white p-4 rounded-4 shadow-sm" style="width: 100%; max-width: 900px;">
       <h3 class="fw-bold mb-1 text-center" style="color: #222;">Olá, {{ usuario.nome }}! 👋</h3>
+      <p class="text-center text-muted mb-2">
+        {% if usuario.tipo == 'Administrador' %}Administrador{% elif usuario.tipo == 'Dono do prédio' %}Proprietário{% elif usuario.tipo == 'Zelador' %}Porteiro{% elif usuario.tipo == 'Condomino' %}Morador{% else %}{{ usuario.tipo }}{% endif %}
+      </p>
       <p class="text-center text-muted mb-4">Você tem encomendas aguardando retirada.</p>
       <div class="d-flex justify-content-center my-3">
         <input type="text" class="form-control w-50 rounded-3 bg-light" id="search" placeholder="Buscar encomendas...">

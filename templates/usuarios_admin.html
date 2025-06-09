@@ -70,7 +70,9 @@
                 <tr>
                   <td>{{ usuario.nome }}</td>
                   <td>{{ usuario.email }}</td>
-                  <td>{{ usuario.tipo }}</td>
+                  <td>
+                    {% if usuario.tipo == 'Administrador' %}Administrador{% elif usuario.tipo == 'Dono do prédio' %}Proprietário{% elif usuario.tipo == 'Zelador' %}Porteiro{% elif usuario.tipo == 'Condomino' %}Morador{% else %}{{ usuario.tipo }}{% endif %}
+                  </td>
                   <td>
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario{{ usuario.id }}"><i class="bi bi-pencil"></i> Editar</button>
                   </td>
@@ -97,9 +99,9 @@
                             <label class="form-label">Tipo</label>
                             <select class="form-select" name="tipo" required>
                               <option value="Administrador" {% if usuario.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
-                              <option value="Dono do prédio" {% if usuario.tipo == 'Dono do prédio' %}selected{% endif %}>Dono do prédio</option>
-                              <option value="Zelador" {% if usuario.tipo == 'Zelador' %}selected{% endif %}>Zelador</option>
-                              <option value="Condomino" {% if usuario.tipo == 'Condomino' %}selected{% endif %}>Condomino</option>
+                              <option value="Dono do prédio" {% if usuario.tipo == 'Dono do prédio' %}selected{% endif %}>Proprietário</option>
+                              <option value="Zelador" {% if usuario.tipo == 'Zelador' %}selected{% endif %}>Porteiro</option>
+                              <option value="Condomino" {% if usuario.tipo == 'Condomino' %}selected{% endif %}>Morador</option>
                             </select>
                           </div>
                           <div class="mb-3">
