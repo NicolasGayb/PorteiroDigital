@@ -9,68 +9,52 @@
     <!-- Ícones Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
-<body>
+<body style="background: #f4f4f4;">
 
-    <!-- Barra de navegação elegante -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container d-flex justify-content-between">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-house-door-fill" style="font-size: 2.5rem; color: #fff;"></i>
-                <span class="ms-2 fw-bold">Condômino Fácil</span>
-            </a>
-            <div class="d-flex gap-3">
-                <a href="/login" class="btn btn-success">Entrar</a>
-                <a href="/register" class="btn btn-outline-light">Registrar</a>
+  <div class="container d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="text-center mb-4">
+      <i class="bi bi-building" style="font-size: 2.5rem; color: #4da3ff;"></i>
+      <h1 class="fw-bold" style="color: #4da3ff; font-size: 2rem;">Porteiro Digital</h1>
+    </div>
+    <div class="bg-white p-4 rounded-4 shadow-sm" style="width: 100%; max-width: 700px;">
+      <h3 class="fw-bold mb-3 text-center" style="color: #222;">Gerencie seu condomínio com eficiência</h3>
+      <p class="lead text-center mb-4">Plataforma moderna para encomendas, comunicação e administração.</p>
+      <div class="row text-center">
+        <div class="col-md-4 mb-4">
+          <div class="card border-0 shadow-sm py-4 h-100">
+            <div class="mb-3">
+              <i class="bi bi-box-seam" style="font-size: 2.5rem; color: #198754;"></i>
             </div>
+            <h5 class="fw-bold">Controle de Encomendas</h5>
+            <p class="mb-0">Acompanhe entregas e retiradas com facilidade.</p>
+          </div>
         </div>
-    </nav>
-
-    <!-- Hero Section minimalista -->
-    <header class="hero d-flex align-items-center justify-content-center" style="min-height: 40vh; background: #f8f9fa;">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold">Gerencie seu condomínio com eficiência</h1>
-            <p class="lead">Plataforma moderna para encomendas, comunicação e administração.</p>
+        <div class="col-md-4 mb-4">
+          <div class="card border-0 shadow-sm py-4 h-100">
+            <div class="mb-3">
+              <i class="bi bi-chat-dots" style="font-size: 2.5rem; color: #0d6efd;"></i>
+            </div>
+            <h5 class="fw-bold">Comunicação Direta</h5>
+            <p class="mb-0">Fale com síndicos e moradores de forma eficiente.</p>
+          </div>
         </div>
-    </header>
-
-    <!-- Seção de Recursos minimalista -->
-    <section class="features container mt-5">
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm py-4">
-                    <div class="mb-3">
-                        <i class="bi bi-box-seam" style="font-size: 2.5rem; color: #198754;"></i>
-                    </div>
-                    <h5 class="fw-bold">Controle de Encomendas</h5>
-                    <p class="mb-0">Acompanhe entregas e retiradas com facilidade.</p>
-                </div>
+        <div class="col-md-4 mb-4">
+          <div class="card border-0 shadow-sm py-4 h-100">
+            <div class="mb-3">
+              <i class="bi bi-clipboard-data" style="font-size: 2.5rem; color: #fd7e14;"></i>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm py-4">
-                    <div class="mb-3">
-                        <i class="bi bi-chat-dots" style="font-size: 2.5rem; color: #0d6efd;"></i>
-                    </div>
-                    <h5 class="fw-bold">Comunicação Direta</h5>
-                    <p class="mb-0">Fale com síndicos e moradores de forma eficiente.</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm py-4">
-                    <div class="mb-3">
-                        <i class="bi bi-clipboard-data" style="font-size: 2.5rem; color: #fd7e14;"></i>
-                    </div>
-                    <h5 class="fw-bold">Gestão Transparente</h5>
-                    <p class="mb-0">Acesso facilitado a relatórios e informações.</p>
-                </div>
-            </div>
+            <h5 class="fw-bold">Gestão Transparente</h5>
+            <p class="mb-0">Acesso facilitado a relatórios e informações.</p>
+          </div>
         </div>
-    </section>
+      </div>
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="/login" class="btn" style="background: #4da3ff; color: #fff; font-weight: 500; min-width: 120px;">Entrar</a>
+        <a href="/register" class="btn btn-outline-primary" style="font-weight: 500; min-width: 120px;">Registrar</a>
+      </div>
+    </div>
+  </div>
 
-    <!-- Rodapé moderno -->
-    <footer class="footer text-center mt-5 bg-dark text-white p-3">
-        <p>© 2025 Condômino Fácil. Todos os direitos reservados.</p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
