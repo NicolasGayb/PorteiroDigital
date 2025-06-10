@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 import os
 
 app = Flask(__name__)
@@ -10,7 +12,16 @@ app.secret_key = os.environ.get("SECRET_KEY", "sua_chave_secreta_aqui")
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///usuarios.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Configuração do Flask-Mail para Gmail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'seu_email@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'sua_senha_do_gmail')
+
 db = SQLAlchemy(app)
+mail = Mail(app)
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 # Modelo de usuário
 class Usuario(db.Model):
@@ -275,6 +286,49 @@ def admin_anomalias():
         return redirect(url_for('login'))
     usuario = Usuario.query.get(session['usuario_id'])
     return render_template('admin_anomalias.html', usuario=usuario)
+
+# Rota para recuperação de senha
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = Usuario.query.filter_by(email=email).first()
+        if user:
+            token = serializer.dumps(email, salt='reset-password')
+            link = url_for('reset_password', token=token, _external=True)
+            msg = Message('Redefinição de Senha - Porteiro Digital',
+                          sender=app.config['MAIL_USERNAME'],
+                          recipients=[email])
+            msg.body = f'Clique no link para redefinir sua senha: {link}'
+            try:
+                mail.send(msg)
+                flash('Um link de redefinição foi enviado para seu e-mail.', 'success')
+            except Exception as e:
+                flash('Erro ao enviar e-mail. Contate o suporte.', 'danger')
+        else:
+            flash('E-mail não encontrado.', 'danger')
+        return redirect(url_for('forgot_password'))
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        email = serializer.loads(token, salt='reset-password', max_age=3600)
+    except Exception:
+        flash('O link de redefinição é inválido ou expirou.', 'danger')
+        return redirect(url_for('forgot_password'))
+    if request.method == 'POST':
+        nova_senha = request.form['senha']
+        user = Usuario.query.filter_by(email=email).first()
+        if user:
+            user.senha = generate_password_hash(nova_senha)
+            db.session.commit()
+            flash('Senha redefinida com sucesso!', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash('Usuário não encontrado.', 'danger')
+            return redirect(url_for('forgot_password'))
+    return render_template('reset_password.html', token=token)
 
 # Inicialização da aplicação
 if __name__ == '__main__':
