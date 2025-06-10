@@ -41,7 +41,7 @@
           <input type="password" class="form-control rounded-3 bg-light" id="senha" name="senha" required>
         </div>
         <div class="d-flex justify-content-end mb-3">
-          <a href="#" class="small text-decoration-none" style="color: #4da3ff;">Esqueceu sua senha?</a>
+          <a href="{{ url_for('forgot_password') }}" class="small text-decoration-none" style="color: #4da3ff;" type="button">Esqueceu sua senha?</a>
         </div>
         <button type="submit" class="btn w-100" style="background: #4da3ff; color: #fff; font-weight: 500;">Entrar</button>
         <div class="text-center mt-3">
