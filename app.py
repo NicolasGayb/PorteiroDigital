@@ -35,6 +35,7 @@ class Usuario(db.Model):
     senha = db.Column(db.String(200), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
     destinatario = db.Column(db.String(100), nullable=False)  # Destinatário será sempre igual ao nome completo
+    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'))  # Novo campo para vincular ao condomínio
 
     # Garante que destinatario sempre seja igual ao nome ao criar ou editar um usuário
     def __init__(self, nome, email, senha, tipo):
@@ -241,7 +242,8 @@ def admin_condominios():
             flash('Condomínio cadastrado com sucesso!', 'success')
             return redirect(url_for('admin_condominios'))
     condominios = Condominio.query.all()
-    return render_template('admin_condominios.html', usuario=usuario, condominios=condominios)
+    usuarios = Usuario.query.all()  # Para exibir usuários vinculados
+    return render_template('admin_condominios.html', usuario=usuario, condominios=condominios, usuarios=usuarios)
 
 # Editar condomínio
 @app.route('/admin/condominios/editar/<int:id>', methods=['POST'])
@@ -333,6 +335,61 @@ def reset_password(token):
             flash('Usuário não encontrado.', 'danger')
             return redirect(url_for('forgot_password'))
     return render_template('reset_password.html', token=token)
+
+# Rota para a página de Minhas Encomendas
+@app.route('/minhas-encomendas')
+def minhas_encomendas():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    encomendas_query = Encomenda.query.filter_by(usuario_id=usuario.id)
+    busca = request.args.get('busca', '').strip()
+    status = request.args.get('status', '').strip()
+    data_entrega = request.args.get('data_entrega', '').strip()
+    if busca:
+        encomendas_query = encomendas_query.filter(
+            (Encomenda.nome.ilike(f'%{busca}%')) |
+            (Encomenda.descricao.ilike(f'%{busca}%')) |
+            (Encomenda.codigo.ilike(f'%{busca}%'))
+        )
+    if status:
+        encomendas_query = encomendas_query.filter_by(status=status)
+    if data_entrega:
+        encomendas_query = encomendas_query.filter_by(data_entrega=data_entrega)
+    encomendas = encomendas_query.all()
+    return render_template('minhas_encomendas.html', usuario=usuario, encomendas=encomendas)
+
+# Rota para vincular usuário a condomínio (apenas para administradores)
+@app.route('/admin/condominios/vincular_usuario/<int:condominio_id>', methods=['POST'])
+def vincular_usuario_condominio(condominio_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario_id = request.form.get('usuario_id')
+    if not usuario_id:
+        flash('Selecione um usuário para vincular.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    user = Usuario.query.get(usuario_id)
+    if not user:
+        flash('Usuário não encontrado.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    user.condominio_id = condominio_id
+    db.session.commit()
+    flash(f'Usuário {user.nome} vinculado ao condomínio com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+# Rota para desvincular usuário de condomínio (apenas para administradores)
+@app.route('/admin/condominios/desvincular_usuario/<int:condominio_id>/<int:usuario_id>', methods=['POST'])
+def desvincular_usuario_condominio(condominio_id, usuario_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    user = Usuario.query.get(usuario_id)
+    if not user or user.condominio_id != condominio_id:
+        flash('Usuário não encontrado ou não vinculado a este condomínio.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    user.condominio_id = None
+    db.session.commit()
+    flash(f'Usuário {user.nome} desvinculado do condomínio com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
 
 # Inicialização da aplicação
 if __name__ == '__main__':

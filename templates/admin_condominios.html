@@ -76,13 +76,14 @@
                     <th>Cidade</th>
                     <th>Estado</th>
                     <th>CEP</th>
+                    <th>Usuários Vinculados</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% if condominios|length == 0 %}
                   <tr>
-                    <td colspan="6" class="text-center text-muted">Nenhum condomínio cadastrado.</td>
+                    <td colspan="7" class="text-center text-muted">Nenhum condomínio cadastrado.</td>
                   </tr>
                   {% else %}
                   {% for cond in condominios %}
@@ -92,6 +93,22 @@
                     <td>{{ cond.cidade }}</td>
                     <td>{{ cond.estado }}</td>
                     <td>{{ cond.cep }}</td>
+                    <td>
+                      {% set usuarios_cond = usuarios|selectattr('condominio_id', 'equalto', cond.id)|list %}
+                      {% if usuarios_cond|length == 0 %}
+                        <span class="text-danger">Nenhum usuário</span>
+                      {% else %}
+                        {% for user in usuarios_cond %}
+                          <span class="badge bg-primary">{{ user.nome }} ({{ user.tipo }})
+                            <form method="POST" action="/admin/condominios/desvincular_usuario/{{ cond.id }}/{{ user.id }}" style="display:inline;">
+                              <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" title="Desvincular" onclick="return confirm('Deseja desvincular este usuário do condomínio?');">
+                                <i class="bi bi-x-circle"></i>
+                              </button>
+                            </form>
+                          </span>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    </td>
                     <td>
                       <!-- Botão Editar -->
                       <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarCondominio{{ cond.id }}">
@@ -103,6 +120,10 @@
                           <i class="bi bi-trash"></i> Excluir
                         </button>
                       </form>
+                      <!-- Botão Vincular Usuário -->
+                      <button class="btn btn-sm btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#modalVincularUsuario{{ cond.id }}">
+                        <i class="bi bi-person-plus"></i> Vincular Usuário
+                      </button>
                     </td>
                   </tr>
                   <!-- Modal de edição -->
@@ -139,6 +160,34 @@
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Modal de vincular usuário -->
+                  <div class="modal fade" id="modalVincularUsuario{{ cond.id }}" tabindex="-1" aria-labelledby="modalVincularUsuarioLabel{{ cond.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <form method="POST" action="/admin/condominios/vincular_usuario/{{ cond.id }}">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="modalVincularUsuarioLabel{{ cond.id }}">Vincular Usuário ao Condomínio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="mb-3">
+                              <label class="form-label">Selecione o usuário</label>
+                              <select class="form-select" name="usuario_id" required>
+                                <option value="">Selecione...</option>
+                                {% for user in usuarios if not user.condominio_id or user.condominio_id != cond.id %}
+                                  <option value="{{ user.id }}">{{ user.nome }} ({{ user.tipo }})</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Vincular</button>
                           </div>
                         </form>
                       </div>
