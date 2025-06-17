@@ -285,12 +285,33 @@ def excluir_condominio(id):
     flash('Condomínio excluído com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
-@app.route('/admin/configuracoes')
+@app.route('/admin/configuracoes', methods=['GET', 'POST'])
 def admin_configuracoes():
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
     usuario = Usuario.query.get(session['usuario_id'])
-    return render_template('admin_configuracoes.html', usuario=usuario)
+    if request.method == 'POST':
+        perfil_id = request.form.get('perfil_id')
+        nome = request.form.get('nome')
+        descricao = request.form.get('descricao')
+        if perfil_id:  # Editar perfil existente
+            perfil = Perfil.query.get(perfil_id)
+            if perfil:
+                perfil.nome = nome
+                perfil.descricao = descricao
+                db.session.commit()
+                flash('Perfil atualizado com sucesso!', 'success')
+        else:  # Criar novo perfil
+            if Perfil.query.filter_by(nome=nome).first():
+                flash('Já existe um perfil com esse nome.', 'danger')
+            else:
+                novo_perfil = Perfil(nome=nome, descricao=descricao)
+                db.session.add(novo_perfil)
+                db.session.commit()
+                flash('Perfil criado com sucesso!', 'success')
+        return redirect(url_for('admin_configuracoes'))
+    perfis = Perfil.query.all()
+    return render_template('admin_configuracoes.html', usuario=usuario, perfis=perfis)
 
 @app.route('/admin/anomalias')
 def admin_anomalias():
@@ -396,34 +417,6 @@ def desvincular_usuario_condominio(condominio_id, usuario_id):
     db.session.commit()
     flash(f'Usuário {user.nome} desvinculado do condomínio com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
-
-@app.route('/admin/perfis', methods=['GET', 'POST'])
-def admin_perfis():
-    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
-        return redirect(url_for('login'))
-    usuario = Usuario.query.get(session['usuario_id'])
-    if request.method == 'POST':
-        perfil_id = request.form.get('perfil_id')
-        nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
-        if perfil_id:  # Editar perfil existente
-            perfil = Perfil.query.get(perfil_id)
-            if perfil:
-                perfil.nome = nome
-                perfil.descricao = descricao
-                db.session.commit()
-                flash('Perfil atualizado com sucesso!', 'success')
-        else:  # Criar novo perfil
-            if Perfil.query.filter_by(nome=nome).first():
-                flash('Já existe um perfil com esse nome.', 'danger')
-            else:
-                novo_perfil = Perfil(nome=nome, descricao=descricao)
-                db.session.add(novo_perfil)
-                db.session.commit()
-                flash('Perfil criado com sucesso!', 'success')
-        return redirect(url_for('admin_perfis'))
-    perfis = Perfil.query.all()
-    return render_template('admin_perfis.html', usuario=usuario, perfis=perfis)
 
 # Inicialização da aplicação
 if __name__ == '__main__':
