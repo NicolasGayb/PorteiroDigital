@@ -5,6 +5,7 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 # Carregar variáveis de ambiente do .env
 load_dotenv()
@@ -161,7 +162,7 @@ def painel():
 
     tipo = session['tipo']
     if tipo == 'Zelador':
-        return redirect(url_for('painel_zelador'))
+        return redirect(url_for('painel_porteiro'))
     elif tipo == 'Condomino':
         return redirect(url_for('painel_condomino'))
     elif tipo == 'Administrador':
@@ -172,9 +173,30 @@ def painel():
         return "Tipo de usuário não reconhecido, favor entre em contato com o administrador do sistema."
 
 # Painel do Zelador
-@app.route('/painel/zelador')
-def painel_zelador():
-    return render_template('painel_zelador.html')
+@app.route('/painel/porteiro')
+def painel_porteiro():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
+    usuario = Usuario.query.get(session['usuario_id'])
+    condominio_id = usuario.condominio_id
+
+    # Histórico do porteiro (encomendas registradas por ele)
+    entregas = Encomenda.query.filter_by(registrado_por=usuario.id).order_by(Encomenda.created_at.desc()).all()
+
+    # Encomendas do mês atual para o condomínio
+    now = datetime.now()
+    encomendas_mes = Encomenda.query.filter(
+        Encomenda.condominio_id == condominio_id,
+        Encomenda.created_at >= datetime(now.year, now.month, 1)
+    ).order_by(Encomenda.created_at.desc()).all()
+
+    return render_template(
+        'painel_porteiro.html',
+        usuario=usuario,
+        entregas=entregas,
+        encomendas_mes=encomendas_mes
+    )
 
 # Painel do Condômino
 @app.route('/painel/condomino')
