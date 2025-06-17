@@ -73,6 +73,23 @@ class Perfil(db.Model):
     nome = db.Column(db.String(50), unique=True, nullable=False)
     descricao = db.Column(db.String(200), nullable=True)
 
+# Modelo de Log
+class Log(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data_hora = db.Column(db.DateTime, nullable=False)
+    usuario_nome = db.Column(db.String(100), nullable=False)
+    acao = db.Column(db.String(100), nullable=False)
+    detalhes = db.Column(db.String(200), nullable=True)
+
+# Modelo de Notificação Enviada
+class NotificacaoEnviada(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data_hora = db.Column(db.DateTime, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)
+    usuario_nome = db.Column(db.String(100), nullable=True)
+    assunto = db.Column(db.String(200), nullable=False)
+    mensagem = db.Column(db.Text, nullable=False)
+
 # Rota inicial - Página de marketing com botão de login/registro
 @app.route('/')
 def index():
@@ -285,33 +302,91 @@ def excluir_condominio(id):
     flash('Condomínio excluído com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
+# Configuração de notificações globais (simples, usando variáveis em memória para exemplo)
+notificacoes_globais = {
+    'notificacoes_email': True,
+    'notificacoes_encomenda': True,
+    'notificacoes_alertas': True
+}
+
+def enviar_notificacao_global(assunto, mensagem, usuarios):
+    from datetime import datetime
+    with app.app_context():
+        for user in usuarios:
+            try:
+                msg = Message(assunto, sender=app.config['MAIL_USERNAME'], recipients=[user.email])
+                msg.body = mensagem
+                mail.send(msg)
+                # Salva histórico de envio
+                notificacao = NotificacaoEnviada(
+                    data_hora=datetime.now(),
+                    usuario_id=user.id,
+                    usuario_nome=user.nome,
+                    assunto=assunto,
+                    mensagem=mensagem
+                )
+                db.session.add(notificacao)
+            except Exception as e:
+                print(f"Erro ao enviar e-mail para {user.email}: {e}")
+        db.session.commit()
+
 @app.route('/admin/configuracoes', methods=['GET', 'POST'])
 def admin_configuracoes():
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
     usuario = Usuario.query.get(session['usuario_id'])
+    global notificacoes_globais
     if request.method == 'POST':
-        perfil_id = request.form.get('perfil_id')
-        nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
-        if perfil_id:  # Editar perfil existente
-            perfil = Perfil.query.get(perfil_id)
-            if perfil:
-                perfil.nome = nome
-                perfil.descricao = descricao
-                db.session.commit()
-                flash('Perfil atualizado com sucesso!', 'success')
-        else:  # Criar novo perfil
-            if Perfil.query.filter_by(nome=nome).first():
-                flash('Já existe um perfil com esse nome.', 'danger')
-            else:
-                novo_perfil = Perfil(nome=nome, descricao=descricao)
-                db.session.add(novo_perfil)
-                db.session.commit()
-                flash('Perfil criado com sucesso!', 'success')
+        # Verifica se é submissão do formulário de notificações
+        if 'notificacoes_email' in request.form or 'notificacoes_encomenda' in request.form or 'notificacoes_alertas' in request.form:
+            notificacoes_globais['notificacoes_email'] = 'notificacoes_email' in request.form
+            notificacoes_globais['notificacoes_encomenda'] = 'notificacoes_encomenda' in request.form
+            notificacoes_globais['notificacoes_alertas'] = 'notificacoes_alertas' in request.form
+            assunto = request.form.get('assunto_notificacao', 'Configuração de Notificações Atualizada')
+            mensagem = request.form.get('mensagem_notificacao', 'As preferências globais de notificações da plataforma foram atualizadas pelo administrador.')
+            flash('Preferências de notificações atualizadas!', 'success')
+            # Envia notificação real se marcado
+            if notificacoes_globais['notificacoes_email']:
+                usuarios = Usuario.query.all()
+                enviar_notificacao_global(
+                    assunto,
+                    mensagem,
+                    usuarios
+                )
+                flash('Notificações enviadas por e-mail para todos os usuários.', 'info')
+        else:
+            perfil_id = request.form.get('perfil_id')
+            nome = request.form.get('nome')
+            descricao = request.form.get('descricao')
+            if perfil_id:  # Editar perfil existente
+                perfil = Perfil.query.get(perfil_id)
+                if perfil:
+                    perfil.nome = nome
+                    perfil.descricao = descricao
+                    db.session.commit()
+                    flash('Perfil atualizado com sucesso!', 'success')
+            else:  # Criar novo perfil
+                if Perfil.query.filter_by(nome=nome).first():
+                    flash('Já existe um perfil com esse nome.', 'danger')
+                else:
+                    novo_perfil = Perfil(nome=nome, descricao=descricao)
+                    db.session.add(novo_perfil)
+                    db.session.commit()
+                    flash('Perfil criado com sucesso!', 'success')
         return redirect(url_for('admin_configuracoes'))
     perfis = Perfil.query.all()
-    return render_template('admin_configuracoes.html', usuario=usuario, perfis=perfis)
+    logs = Log.query.order_by(Log.data_hora.desc()).limit(50).all()
+    historico_notificacoes = NotificacaoEnviada.query.order_by(NotificacaoEnviada.data_hora.desc()).limit(50).all()
+    return render_template(
+        'admin_configuracoes.html',
+        usuario=usuario,
+        perfis=perfis,
+        logs=logs,
+        notificacoes_email=notificacoes_globais['notificacoes_email'],
+        notificacoes_encomenda=notificacoes_globais['notificacoes_encomenda'],
+        notificacoes_alertas=notificacoes_globais['notificacoes_alertas'],
+        historico_notificacoes=historico_notificacoes
+    )
 
 @app.route('/admin/anomalias')
 def admin_anomalias():
