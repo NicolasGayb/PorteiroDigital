@@ -35,7 +35,7 @@ class Usuario(db.Model):
     senha = db.Column(db.String(200), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
     destinatario = db.Column(db.String(100), nullable=False)  # Destinatário será sempre igual ao nome completo
-    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'))  # Novo campo para vincular ao condomínio
+    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'), nullable=True)  # Novo campo para vincular ao condomínio
 
     # Garante que destinatario sempre seja igual ao nome ao criar ou editar um usuário
     def __init__(self, nome, email, senha, tipo):
@@ -66,6 +66,12 @@ class Condominio(db.Model):
     cidade = db.Column(db.String(100), nullable=False)
     estado = db.Column(db.String(50), nullable=False)
     cep = db.Column(db.String(20), nullable=False)
+
+# Modelo de Perfil de Usuário
+class Perfil(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(50), unique=True, nullable=False)
+    descricao = db.Column(db.String(200), nullable=True)
 
 # Rota inicial - Página de marketing com botão de login/registro
 @app.route('/')
@@ -390,6 +396,34 @@ def desvincular_usuario_condominio(condominio_id, usuario_id):
     db.session.commit()
     flash(f'Usuário {user.nome} desvinculado do condomínio com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
+
+@app.route('/admin/perfis', methods=['GET', 'POST'])
+def admin_perfis():
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    if request.method == 'POST':
+        perfil_id = request.form.get('perfil_id')
+        nome = request.form.get('nome')
+        descricao = request.form.get('descricao')
+        if perfil_id:  # Editar perfil existente
+            perfil = Perfil.query.get(perfil_id)
+            if perfil:
+                perfil.nome = nome
+                perfil.descricao = descricao
+                db.session.commit()
+                flash('Perfil atualizado com sucesso!', 'success')
+        else:  # Criar novo perfil
+            if Perfil.query.filter_by(nome=nome).first():
+                flash('Já existe um perfil com esse nome.', 'danger')
+            else:
+                novo_perfil = Perfil(nome=nome, descricao=descricao)
+                db.session.add(novo_perfil)
+                db.session.commit()
+                flash('Perfil criado com sucesso!', 'success')
+        return redirect(url_for('admin_perfis'))
+    perfis = Perfil.query.all()
+    return render_template('admin_perfis.html', usuario=usuario, perfis=perfis)
 
 # Inicialização da aplicação
 if __name__ == '__main__':
