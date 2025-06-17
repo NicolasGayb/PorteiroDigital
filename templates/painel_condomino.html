@@ -6,22 +6,23 @@
     <title>Porteiro Digital</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body style="background: #f4f4f4;">
   <div class="d-flex" style="min-height: 100vh;">
     <!-- Sidebar Lateral -->
-    <nav class="bg-white border-end shadow-sm d-flex flex-column justify-content-between" style="width: 240px; min-height: 100vh; position:relative;">
+    <nav class="bg-white border-end shadow-sm d-flex flex-column justify-content-between" style="width: 260px; min-height: 100vh; position:relative;">
       <div>
         <div class="d-flex align-items-center gap-2 px-4 pt-4 pb-3">
           <i class="bi bi-building" style="font-size: 2rem; color: #4da3ff;"></i>
-          <span class="fw-bold" style="color: #4da3ff; font-size: 1.3rem;">Porteiro Digital</span>
+          <span class="fw-bold" style="color: #4da3ff; font-size: 1.5rem;">Portaria Link</span>
         </div>
         <ul class="nav flex-column mt-3">
           <li class="nav-item">
             <a class="nav-link active fw-semibold" href="/painel/condomino" style="color: #4da3ff;"><i class="bi bi-house-door me-2"></i>Início</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark" href="#"><i class="bi bi-box-seam me-2"></i>Minhas Encomendas</a>
+            <a class="nav-link text-dark" href="/minhas_encomendas"><i class="bi bi-box-seam me-2"></i>Minhas Encomendas</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-dark" href="#"><i class="bi bi-chat-dots me-2"></i>Mensagens</a>
@@ -30,6 +31,7 @@
             <a class="nav-link text-dark" href="#"><i class="bi bi-gear me-2"></i>Configurações</a>
           </li>
         </ul>
+        <div class="flex-grow-1"></div>
       </div>
       <footer class="mt-auto w-100">
         <div class="d-flex align-items-center gap-2 px-4 pb-2">
@@ -50,6 +52,7 @@
         <h2 class="fw-bold mb-1" style="font-size:2rem;">Bem-vindo, {{ usuario.nome }}!</h2>
         <div class="text-muted" style="font-size:1.1rem;">Aqui você acompanha suas encomendas e mensagens.</div>
       </div>
+      <!-- Cards de resumo -->
       <div class="row g-4 mb-3">
         <div class="col-lg-6">
           <div class="card border-0 shadow-sm h-100">
@@ -62,6 +65,7 @@
                       <th>Código</th>
                       <th>Nome</th>
                       <th>Descrição</th>
+                      <th>Apto</th>
                       <th>Data de Entrega</th>
                       <th>Status</th>
                     </tr>
@@ -72,9 +76,12 @@
                       <td>{{ encomenda.codigo }}</td>
                       <td>{{ encomenda.nome }}</td>
                       <td>{{ encomenda.descricao }}</td>
+                      <td>{{ encomenda.apartamento }}</td>
                       <td>{{ encomenda.data_entrega }}</td>
                       <td>{{ encomenda.status }}</td>
                     </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted">Nenhuma encomenda encontrada para seu apartamento.</td></tr>
                     {% endfor %}
                   </tbody>
                 </table>
@@ -89,6 +96,57 @@
               <div class="alert alert-info">Funcionalidade de mensagens em breve.</div>
             </div>
           </div>
+        </div>
+      </div>
+      <!-- Cards de navegação -->
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a href="/minhas_encomendas" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Ver Todas as Encomendas</h5>
+                  <i class="bi bi-box-seam text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Visualize o histórico completo das suas encomendas.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Ir para Minhas Encomendas <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-4">
+          <a href="#" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Mensagens</h5>
+                  <i class="bi bi-chat-dots text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Envie e receba mensagens da portaria e administração.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Em breve <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-4">
+          <a href="#" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Configurações</h5>
+                  <i class="bi bi-gear text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Atualize seus dados e preferências.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Em breve <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </main>
