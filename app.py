@@ -161,7 +161,7 @@ def painel():
         return redirect(url_for('login'))
 
     tipo = session['tipo']
-    if tipo == 'Zelador':
+    if tipo == 'Porteiro':
         return redirect(url_for('painel_porteiro'))
     elif tipo == 'Condomino':
         return redirect(url_for('painel_condomino'))

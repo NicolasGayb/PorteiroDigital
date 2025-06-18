@@ -44,7 +44,7 @@
           <div>
             <div style="font-size:0.95rem;">{{ usuario.nome }}</div>
             <div class="text-muted" style="font-size:0.85rem;">
-              {% if usuario.tipo == 'Administrador' %}Administrador{% elif usuario.tipo == 'Dono do prédio' %}Proprietário{% elif usuario.tipo == 'Zelador' %}Porteiro{% elif usuario.tipo == 'Condomino' %}Morador{% else %}{{ usuario.tipo }}{% endif %}
+              {% if usuario.tipo == 'Administrador' %}Administrador{% elif usuario.tipo == 'Dono do prédio' %}Proprietário{% elif usuario.tipo == 'Porteiro' %}Porteiro{% elif usuario.tipo == 'Condomino' %}Morador{% else %}{{ usuario.tipo }}{% endif %}
             </div>
           </div>
         </div>
