@@ -58,6 +58,9 @@ class Encomenda(db.Model):
     tamanho = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(30), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))  # Relacionado a Usuario
+    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'))  # Adicionado se não existir
+    registrado_por = db.Column(db.Integer, db.ForeignKey('usuario.id'))    # Porteiro que registrou
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Modelo de Condomínio
 class Condominio(db.Model):
