@@ -6,6 +6,7 @@ from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from sqlalchemy import func
 
 # Carregar variáveis de ambiente do .env
 load_dotenv()
@@ -512,12 +513,41 @@ def admin_configuracoes():
         historico_notificacoes=historico_notificacoes
     )
 
-@app.route('/admin/anomalias')
+@app.route('/admin/anomalias', methods=['GET', 'POST'])
 def admin_anomalias():
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
     usuario = Usuario.query.get(session['usuario_id'])
-    return render_template('admin_anomalias.html', usuario=usuario)
+    data_inicio = request.form.get('data_inicio')
+    data_fim = request.form.get('data_fim')
+    query = Encomenda.query
+    if data_inicio:
+        query = query.filter(Encomenda.data_entrega >= data_inicio)
+    if data_fim:
+        query = query.filter(Encomenda.data_entrega <= data_fim)
+    encomendas = query.all()
+    # Análise simples: apartamentos com mais encomendas que o dobro da média
+    total = len(encomendas)
+    anomalias = []
+    if total > 0:
+        # Contagem por apartamento
+        from collections import Counter
+        contagem = Counter([e.apartamento_id for e in encomendas])
+        media = total / len(contagem) if contagem else 0
+        for ap_id, qtd in contagem.items():
+            if qtd > 2 * media:
+                ap = Apartamento.query.get(ap_id)
+                anomalias.append({
+                    'apartamento': f"{ap.numero}{' - Bloco ' + ap.bloco if ap.bloco else ''}",
+                    'qtd': qtd,
+                    'media': round(media, 2)
+                })
+        # Horários incomuns (fora de 7h-22h)
+        horarios = [e.created_at for e in encomendas if e.created_at]
+        horarios_incomuns = [e for e in encomendas if e.created_at and (e.created_at.hour < 7 or e.created_at.hour > 22)]
+    else:
+        horarios_incomuns = []
+    return render_template('admin_anomalias.html', usuario=usuario, anomalias=anomalias, horarios_incomuns=horarios_incomuns, data_inicio=data_inicio, data_fim=data_fim)
 
 # Rota para recuperação de senha
 @app.route('/forgot-password', methods=['GET', 'POST'])

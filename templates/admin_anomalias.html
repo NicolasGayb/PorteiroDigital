@@ -17,7 +17,34 @@
         <h2 class="fw-bold mb-1" style="font-size:2rem;">Detectar Anomalias</h2>
         <div class="text-muted" style="font-size:1.1rem;">Use IA para identificar padrões de entrega incomuns.</div>
       </div>
-      <div class="alert alert-info">Funcionalidade de detecção de anomalias em desenvolvimento.</div>
+      <form method="POST" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <label class="form-label">Data início</label>
+          <input type="date" class="form-control" name="data_inicio" value="{{ data_inicio or '' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Data fim</label>
+          <input type="date" class="form-control" name="data_fim" value="{{ data_fim or '' }}">
+        </div>
+        <div class="col-md-3 align-self-end">
+          <button type="submit" class="btn btn-primary">Analisar</button>
+        </div>
+      </form>
+      {% if anomalias or horarios_incomuns %}
+      <div class="alert alert-warning">
+        <strong>Anomalias detectadas:</strong>
+        <ul class="mb-0">
+          {% for a in anomalias %}
+            <li>Apartamento <b>{{ a.apartamento }}</b> recebeu <b>{{ a.qtd }}</b> encomendas (média: {{ a.media }})</li>
+          {% endfor %}
+          {% for e in horarios_incomuns %}
+            <li>Entrega em horário incomum: <b>{{ e.nome }}</b> para apartamento {{ e.apartamento_id }} às {{ e.created_at.strftime('%d/%m/%Y %H:%M') }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% else %}
+      <div class="alert alert-info">Nenhuma anomalia detectada para o período selecionado.</div>
+      {% endif %}
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
