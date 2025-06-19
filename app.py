@@ -378,50 +378,52 @@ def cadastrar_apartamento(condominio_id):
     if not numero:
         flash('Informe o número do apartamento.', 'danger')
         return redirect(url_for('admin_condominios'))
+    # Verifica duplicidade
+    existe = Apartamento.query.filter_by(condominio_id=condominio_id, numero=numero, bloco=bloco).first()
+    if existe:
+        flash('Já existe um apartamento com esse número e bloco neste condomínio.', 'danger')
+        return redirect(url_for('admin_condominios'))
     novo_ap = Apartamento(numero=numero, bloco=bloco, condominio_id=condominio_id)
     db.session.add(novo_ap)
     db.session.commit()
     flash('Apartamento cadastrado com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
-# Vincular usuário a apartamento
-@app.route('/admin/apartamentos/<int:apartamento_id>/vincular_usuario', methods=['POST'])
-def vincular_usuario_apartamento(apartamento_id):
+# Editar apartamento
+@app.route('/admin/apartamentos/<int:apartamento_id>/editar', methods=['POST'])
+def editar_apartamento(apartamento_id):
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
-    usuario_id = request.form.get('usuario_id')
-    if not usuario_id:
-        flash('Selecione um usuário para vincular.', 'danger')
+    ap = Apartamento.query.get_or_404(apartamento_id)
+    numero = request.form.get('numero')
+    bloco = request.form.get('bloco')
+    if not numero:
+        flash('Informe o número do apartamento.', 'danger')
         return redirect(url_for('admin_condominios'))
-    ap = Apartamento.query.get(apartamento_id)
-    user = Usuario.query.get(usuario_id)
-    if not ap or not user:
-        flash('Apartamento ou usuário não encontrado.', 'danger')
+    # Verifica duplicidade (exceto o próprio)
+    existe = Apartamento.query.filter(
+        Apartamento.condominio_id == ap.condominio_id,
+        Apartamento.numero == numero,
+        Apartamento.bloco == bloco,
+        Apartamento.id != ap.id
+    ).first()
+    if existe:
+        flash('Já existe um apartamento com esse número e bloco neste condomínio.', 'danger')
         return redirect(url_for('admin_condominios'))
-    if user not in ap.usuarios:
-        ap.usuarios.append(user)
-        db.session.commit()
-        flash(f'Usuário {user.nome} vinculado ao apartamento com sucesso!', 'success')
-    else:
-        flash('Usuário já está vinculado a este apartamento.', 'warning')
+    ap.numero = numero
+    ap.bloco = bloco
+    db.session.commit()
+    flash('Apartamento atualizado com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
-# Desvincular usuário de apartamento
-@app.route('/admin/apartamentos/<int:apartamento_id>/desvincular_usuario/<int:usuario_id>', methods=['POST'])
-def desvincular_usuario_apartamento(apartamento_id, usuario_id):
+@app.route('/admin/apartamentos/<int:apartamento_id>/excluir', methods=['POST'])
+def excluir_apartamento(apartamento_id):
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
-    ap = Apartamento.query.get(apartamento_id)
-    user = Usuario.query.get(usuario_id)
-    if not ap or not user:
-        flash('Apartamento ou usuário não encontrado.', 'danger')
-        return redirect(url_for('admin_condominios'))
-    if user in ap.usuarios:
-        ap.usuarios.remove(user)
-        db.session.commit()
-        flash(f'Usuário {user.nome} desvinculado do apartamento com sucesso!', 'success')
-    else:
-        flash('Usuário não está vinculado a este apartamento.', 'warning')
+    ap = Apartamento.query.get_or_404(apartamento_id)
+    db.session.delete(ap)
+    db.session.commit()
+    flash('Apartamento excluído com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
 # Configuração de notificações globais (simples, usando variáveis em memória para exemplo)
@@ -644,32 +646,6 @@ def registrar_encomenda():
         flash('Encomenda registrada com sucesso!', 'success')
         return redirect(url_for('painel_porteiro'))
     return render_template('registrar_encomenda.html', usuario=usuario, apartamentos=apartamentos)
-
-@app.route('/admin/apartamentos/<int:apartamento_id>/editar', methods=['POST'])
-def editar_apartamento(apartamento_id):
-    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
-        return redirect(url_for('login'))
-    ap = Apartamento.query.get_or_404(apartamento_id)
-    numero = request.form.get('numero')
-    bloco = request.form.get('bloco')
-    if not numero:
-        flash('Informe o número do apartamento.', 'danger')
-        return redirect(url_for('admin_condominios'))
-    ap.numero = numero
-    ap.bloco = bloco
-    db.session.commit()
-    flash('Apartamento atualizado com sucesso!', 'success')
-    return redirect(url_for('admin_condominios'))
-
-@app.route('/admin/apartamentos/<int:apartamento_id>/excluir', methods=['POST'])
-def excluir_apartamento(apartamento_id):
-    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
-        return redirect(url_for('login'))
-    ap = Apartamento.query.get_or_404(apartamento_id)
-    db.session.delete(ap)
-    db.session.commit()
-    flash('Apartamento excluído com sucesso!', 'success')
-    return redirect(url_for('admin_condominios'))
 
 # Inicialização da aplicação
 if __name__ == '__main__':
