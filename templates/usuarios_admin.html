@@ -37,7 +37,7 @@
                   <td>{{ user.nome }}</td>
                   <td>{{ user.email }}</td>
                   <td>
-                    {% if user.tipo == 'Administrador' %}Administrador{% elif user.tipo == 'Dono do prédio' %}Proprietário{% elif user.tipo == 'Zelador' %}Porteiro{% elif user.tipo == 'Condomino' %}Morador{% else %}{{ user.tipo }}{% endif %}
+                    {% if user.tipo == 'Administrador' %}Administrador{% elif user.tipo == 'Síndico' %}Síndico{% elif user.tipo == 'Zelador' %}Porteiro{% elif user.tipo == 'Condomino' %}Morador{% else %}{{ user.tipo }}{% endif %}
                   </td>
                   <td>
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario{{ user.id }}"><i class="bi bi-pencil"></i> Editar</button>
@@ -65,7 +65,7 @@
                             <label class="form-label">Tipo</label>
                             <select class="form-select" name="tipo" required>
                               <option value="Administrador" {% if user.tipo == 'Administrador' %}selected{% endif %}>Administrador</option>
-                              <option value="Dono do prédio" {% if user.tipo == 'Dono do prédio' %}selected{% endif %}>Proprietário</option>
+                              <option value="Síndico" {% if user.tipo == 'Síndico' %}selected{% endif %}>Síndico</option>
                               <option value="Zelador" {% if user.tipo == 'Zelador' %}selected{% endif %}>Porteiro</option>
                               <option value="Condomino" {% if user.tipo == 'Condomino' %}selected{% endif %}>Morador</option>
                             </select>

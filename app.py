@@ -41,7 +41,7 @@ class Usuario(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
-    tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
+    tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Síndico, Zelador, Condomino
     destinatario = db.Column(db.String(100), nullable=False)  # Destinatário será sempre igual ao nome completo
     condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'), nullable=True)  # Só usado para porteiros
     apartamentos = db.relationship('Apartamento', secondary=apartamento_usuario, back_populates='usuarios')
@@ -188,8 +188,8 @@ def painel():
         return redirect(url_for('painel_condomino'))
     elif tipo == 'Administrador':
         return redirect(url_for('painel_admin'))
-    elif tipo == 'Dono do prédio':
-        return redirect(url_for('painel_dono'))
+    elif tipo == 'Síndico':
+        return redirect(url_for('painel_sindico'))
     else:
         return "Tipo de usuário não reconhecido, favor entre em contato com o administrador do sistema."
 
@@ -257,10 +257,10 @@ def painel_condomino():
 
     return render_template('painel_condomino.html', usuario=usuario, encomendas=encomendas)
 
-# Painel do Dono do Prédio
-@app.route('/painel/dono')
-def painel_dono():
-    return render_template('painel_dono.html')
+# Painel do Síndico
+@app.route('/painel/sindico')
+def painel_sindico():
+    return render_template('painel_sindico.html')
 
 # Painel do Administrador
 @app.route('/painel/admin')

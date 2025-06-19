@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Síndico</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body style="background: #f4f4f4;">
+  <div class="d-flex" style="min-height: 100vh;">
+    {% include 'sidebar_sindico.html' %}
+    <main class="flex-grow-1 px-4 py-4">
+      <div class="mb-4">
+        <h2 class="fw-bold mb-1" style="font-size:2rem;">Visão Geral do Condomínio</h2>
+        <div class="text-muted" style="font-size:1.1rem;">Gerencie apartamentos, moradores, porteiros e configurações do seu condomínio.</div>
+      </div>
+      <div class="row g-4 mb-3">
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3">Resumo Geral</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="border rounded-3 p-3 text-center">
+                    <div class="text-muted">Total de Entregas</div>
+                    <div class="fw-bold fs-4">0</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="border rounded-3 p-3 text-center">
+                    <div class="text-muted">Retiradas Pendentes</div>
+                    <div class="fw-bold fs-4">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card border-0 shadow-sm h-100 d-flex align-items-center justify-content-center text-center" style="min-height:100%;">
+            <div class="card-body">
+              <h5 class="fw-bold mb-2">Otimize a Gestão do Condomínio</h5>
+              <div class="text-muted">Gerencie moradores, porteiros e apartamentos de forma eficiente.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a href="/admin/condominios" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Gerenciar Apartamentos</h5>
+                  <i class="bi bi-door-open text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Adicione, edite ou remova apartamentos e moradores.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Ir para Gerenciar Apartamentos <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-4">
+          <a href="/admin/configuracoes" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Configurações do Condomínio</h5>
+                  <i class="bi bi-gear text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Ajuste regras, notificações e preferências do condomínio.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Ir para Configurações <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-4">
+          <a href="/admin/anomalias" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Detectar Anomalias</h5>
+                  <i class="bi bi-shield-check text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Use IA para identificar padrões incomuns de entregas.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Ir para Detecção de Anomalias <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-lg-4">
+          <a href="/admin/usuarios" class="text-decoration-none">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 flex-grow-1 text-dark">Usuários do Condomínio</h5>
+                  <i class="bi bi-people text-primary" style="font-size:1.3rem;"></i>
+                </div>
+                <div class="text-muted mb-3">Gerencie moradores, porteiros e permissões do condomínio.</div>
+                <div class="btn btn-light border w-100 d-flex align-items-center justify-content-between">
+                  Ir para Usuários <i class="bi bi-arrow-right ms-2"></i>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}
