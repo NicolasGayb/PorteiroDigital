@@ -117,6 +117,22 @@
                             </div>
                           {% endif %}
                         </div>
+                        <div class="mt-4">
+                          <div class="fw-semibold mb-1">Apartamentos cadastrados:</div>
+                          {% set apartamentos_cond = apartamentos|selectattr('condominio_id', 'equalto', cond.id)|list %}
+                          {% if apartamentos_cond|length == 0 %}
+                            <span class="text-danger">Nenhum apartamento cadastrado.</span>
+                          {% else %}
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                              {% for ap in apartamentos_cond %}
+                                <span class="badge bg-secondary">Apto {{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</span>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                          <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalCadastrarApartamento{{ cond.id }}">
+                            <i class="bi bi-plus"></i> Cadastrar Apartamento
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <!-- Modal de edição -->
@@ -181,6 +197,33 @@
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                               <button type="submit" class="btn btn-primary">Vincular</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Modal de cadastro de apartamento -->
+                    <div class="modal fade" id="modalCadastrarApartamento{{ cond.id }}" tabindex="-1" aria-labelledby="modalCadastrarApartamentoLabel{{ cond.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <form method="POST" action="/admin/condominios/{{ cond.id }}/cadastrar_apartamento">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="modalCadastrarApartamentoLabel{{ cond.id }}">Cadastrar Apartamento</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="mb-3">
+                                <label class="form-label">Número do Apartamento</label>
+                                <input type="text" class="form-control" name="numero" required>
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label">Bloco (opcional)</label>
+                                <input type="text" class="form-control" name="bloco">
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="submit" class="btn btn-primary">Cadastrar</button>
                             </div>
                           </form>
                         </div>

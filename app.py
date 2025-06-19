@@ -57,10 +57,18 @@ class Encomenda(db.Model):
     remetente = db.Column(db.String(50))
     tamanho = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(30), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))  # Relacionado a Usuario
+    apartamento_id = db.Column(db.Integer, db.ForeignKey('apartamento.id'), nullable=False)  # Relaciona com apartamento
     condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'))  # Adicionado se não existir
     registrado_por = db.Column(db.Integer, db.ForeignKey('usuario.id'))    # Porteiro que registrou
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Novo modelo de Apartamento
+class Apartamento(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    numero = db.Column(db.String(20), nullable=False)
+    bloco = db.Column(db.String(20), nullable=True)
+    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)  # Morador responsável
 
 # Modelo de Condomínio
 class Condominio(db.Model):
@@ -176,13 +184,36 @@ def painel():
         return "Tipo de usuário não reconhecido, favor entre em contato com o administrador do sistema."
 
 # Painel do Zelador
-@app.route('/painel/porteiro')
+@app.route('/painel/porteiro', methods=['GET', 'POST'])
 def painel_porteiro():
     if 'usuario_id' not in session:
         return redirect(url_for('login'))
 
     usuario = Usuario.query.get(session['usuario_id'])
     condominio_id = usuario.condominio_id
+
+    # Cadastro de encomenda direto na tela inicial do porteiro
+    apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
+    if request.method == 'POST':
+        apartamento_id = request.form.get('apartamento_id')
+        nome = request.form.get('recipient_name')
+        descricao = request.form.get('descricao')
+        data_entrega = datetime.now().date()
+        nova_encomenda = Encomenda(
+            nome=nome,
+            descricao=descricao,
+            data_entrega=data_entrega,
+            apartamento_id=apartamento_id,
+            condominio_id=condominio_id,
+            registrado_por=usuario.id,
+            created_at=datetime.now(),
+            status='Registrada',
+            tamanho='Padrão'  # Ajuste conforme necessário
+        )
+        db.session.add(nova_encomenda)
+        db.session.commit()
+        flash('Encomenda registrada com sucesso!', 'success')
+        return redirect(url_for('painel_porteiro'))
 
     # Histórico do porteiro (encomendas registradas por ele)
     entregas = Encomenda.query.filter_by(registrado_por=usuario.id).order_by(Encomenda.created_at.desc()).all()
@@ -198,7 +229,8 @@ def painel_porteiro():
         'painel_porteiro.html',
         usuario=usuario,
         entregas=entregas,
-        encomendas_mes=encomendas_mes
+        encomendas_mes=encomendas_mes,
+        apartamentos=apartamentos
     )
 
 # Painel do Condômino
@@ -291,7 +323,8 @@ def admin_condominios():
             return redirect(url_for('admin_condominios'))
     condominios = Condominio.query.all()
     usuarios = Usuario.query.all()  # Para exibir usuários vinculados
-    return render_template('admin_condominios.html', usuario=usuario, condominios=condominios, usuarios=usuarios)
+    apartamentos = Apartamento.query.all()  # Para exibir apartamentos vinculados
+    return render_template('admin_condominios.html', usuario=usuario, condominios=condominios, usuarios=usuarios, apartamentos=apartamentos)
 
 # Editar condomínio
 @app.route('/admin/condominios/editar/<int:id>', methods=['POST'])
@@ -325,6 +358,22 @@ def excluir_condominio(id):
     db.session.delete(condominio)
     db.session.commit()
     flash('Condomínio excluído com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+# Rota para cadastro de apartamento por condomínio, apenas para administradores
+@app.route('/admin/condominios/<int:condominio_id>/cadastrar_apartamento', methods=['POST'])
+def cadastrar_apartamento(condominio_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    numero = request.form.get('numero')
+    bloco = request.form.get('bloco')
+    if not numero:
+        flash('Informe o número do apartamento.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    novo_ap = Apartamento(numero=numero, bloco=bloco, condominio_id=condominio_id)
+    db.session.add(novo_ap)
+    db.session.commit()
+    flash('Apartamento cadastrado com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
 # Configuração de notificações globais (simples, usando variáveis em memória para exemplo)
@@ -517,6 +566,36 @@ def desvincular_usuario_condominio(condominio_id, usuario_id):
     db.session.commit()
     flash(f'Usuário {user.nome} desvinculado do condomínio com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
+
+# Rota para registrar encomenda
+@app.route('/registrar-encomenda', methods=['GET', 'POST'])
+def registrar_encomenda():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    condominio_id = usuario.condominio_id
+    apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
+    if request.method == 'POST':
+        apartamento_id = request.form.get('apartamento_id')
+        nome = request.form.get('recipient_name')
+        descricao = request.form.get('descricao')
+        data_entrega = datetime.now().date()
+        nova_encomenda = Encomenda(
+            nome=nome,
+            descricao=descricao,
+            data_entrega=data_entrega,
+            apartamento_id=apartamento_id,
+            condominio_id=condominio_id,
+            registrado_por=usuario.id,
+            created_at=datetime.now(),
+            status='Registrada',
+            tamanho='Padrão'  # Ajuste conforme necessário
+        )
+        db.session.add(nova_encomenda)
+        db.session.commit()
+        flash('Encomenda registrada com sucesso!', 'success')
+        return redirect(url_for('painel_porteiro'))
+    return render_template('registrar_encomenda.html', usuario=usuario, apartamentos=apartamentos)
 
 # Inicialização da aplicação
 if __name__ == '__main__':

@@ -58,14 +58,19 @@
           <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
               <h5 class="fw-bold mb-3" id="registrar-encomenda">Registrar nova encomenda</h5>
-              <form method="POST" action="/registrar-encomenda">
+              <form method="POST" action="">
                 <div class="mb-3">
                   <label class="form-label">Nome do destinatário</label>
                   <input type="text" class="form-control" name="recipient_name" required>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Apartamento</label>
-                  <input type="text" class="form-control" name="apartment" required>
+                  <select class="form-control" name="apartamento_id" required>
+                    <option value="">Selecione...</option>
+                    {% for ap in apartamentos %}
+                      <option value="{{ ap.id }}">{{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</option>
+                    {% endfor %}
+                  </select>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Descrição</label>
@@ -137,6 +142,37 @@
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-8 col-lg-5">
+          <div class="card border-0 shadow-sm rounded-4 p-2" style="background: #fff;">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3 text-center" id="registrar-encomenda">Registrar nova encomenda</h5>
+              <form method="POST" action="">
+                <div class="mb-3">
+                  <label class="form-label">Nome do destinatário</label>
+                  <input type="text" class="form-control form-control-lg rounded-3" name="recipient_name" required autocomplete="off">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Apartamento</label>
+                  <select class="form-control form-control-lg rounded-3" name="apartamento_id" required>
+                    <option value="">Selecione...</option>
+                    {% for ap in apartamentos %}
+                      <option value="{{ ap.id }}">{{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Descrição</label>
+                  <input type="text" class="form-control form-control-lg rounded-3" name="descricao" required autocomplete="off">
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary btn-lg rounded-3">Registrar Encomenda</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
