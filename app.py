@@ -28,6 +28,12 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.secret_key)
 
+# Tabela de associação muitos-para-muitos entre Apartamento e Usuario
+apartamento_usuario = db.Table('apartamento_usuario',
+    db.Column('apartamento_id', db.Integer, db.ForeignKey('apartamento.id'), primary_key=True),
+    db.Column('usuario_id', db.Integer, db.ForeignKey('usuario.id'), primary_key=True)
+)
+
 # Modelo de usuário
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,7 +42,8 @@ class Usuario(db.Model):
     senha = db.Column(db.String(200), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
     destinatario = db.Column(db.String(100), nullable=False)  # Destinatário será sempre igual ao nome completo
-    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'), nullable=True)  # Novo campo para vincular ao condomínio
+    # condominio_id removido
+    apartamentos = db.relationship('Apartamento', secondary=apartamento_usuario, back_populates='usuarios')
 
     # Garante que destinatario sempre seja igual ao nome ao criar ou editar um usuário
     def __init__(self, nome, email, senha, tipo):
@@ -68,7 +75,8 @@ class Apartamento(db.Model):
     numero = db.Column(db.String(20), nullable=False)
     bloco = db.Column(db.String(20), nullable=True)
     condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)  # Morador responsável
+    # usuario_id removido
+    usuarios = db.relationship('Usuario', secondary=apartamento_usuario, back_populates='apartamentos')
 
 # Modelo de Condomínio
 class Condominio(db.Model):
@@ -322,8 +330,8 @@ def admin_condominios():
             flash('Condomínio cadastrado com sucesso!', 'success')
             return redirect(url_for('admin_condominios'))
     condominios = Condominio.query.all()
-    usuarios = Usuario.query.all()  # Para exibir usuários vinculados
-    apartamentos = Apartamento.query.all()  # Para exibir apartamentos vinculados
+    usuarios = Usuario.query.all()  # Para exibir usuários
+    apartamentos = Apartamento.query.options(db.joinedload(Apartamento.usuarios)).all()  # Apartamentos com usuários
     return render_template('admin_condominios.html', usuario=usuario, condominios=condominios, usuarios=usuarios, apartamentos=apartamentos)
 
 # Editar condomínio
@@ -374,6 +382,46 @@ def cadastrar_apartamento(condominio_id):
     db.session.add(novo_ap)
     db.session.commit()
     flash('Apartamento cadastrado com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+# Vincular usuário a apartamento
+@app.route('/admin/apartamentos/<int:apartamento_id>/vincular_usuario', methods=['POST'])
+def vincular_usuario_apartamento(apartamento_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario_id = request.form.get('usuario_id')
+    if not usuario_id:
+        flash('Selecione um usuário para vincular.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    ap = Apartamento.query.get(apartamento_id)
+    user = Usuario.query.get(usuario_id)
+    if not ap or not user:
+        flash('Apartamento ou usuário não encontrado.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    if user not in ap.usuarios:
+        ap.usuarios.append(user)
+        db.session.commit()
+        flash(f'Usuário {user.nome} vinculado ao apartamento com sucesso!', 'success')
+    else:
+        flash('Usuário já está vinculado a este apartamento.', 'warning')
+    return redirect(url_for('admin_condominios'))
+
+# Desvincular usuário de apartamento
+@app.route('/admin/apartamentos/<int:apartamento_id>/desvincular_usuario/<int:usuario_id>', methods=['POST'])
+def desvincular_usuario_apartamento(apartamento_id, usuario_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    ap = Apartamento.query.get(apartamento_id)
+    user = Usuario.query.get(usuario_id)
+    if not ap or not user:
+        flash('Apartamento ou usuário não encontrado.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    if user in ap.usuarios:
+        ap.usuarios.remove(user)
+        db.session.commit()
+        flash(f'Usuário {user.nome} desvinculado do apartamento com sucesso!', 'success')
+    else:
+        flash('Usuário não está vinculado a este apartamento.', 'warning')
     return redirect(url_for('admin_condominios'))
 
 # Configuração de notificações globais (simples, usando variáveis em memória para exemplo)
@@ -596,6 +644,32 @@ def registrar_encomenda():
         flash('Encomenda registrada com sucesso!', 'success')
         return redirect(url_for('painel_porteiro'))
     return render_template('registrar_encomenda.html', usuario=usuario, apartamentos=apartamentos)
+
+@app.route('/admin/apartamentos/<int:apartamento_id>/editar', methods=['POST'])
+def editar_apartamento(apartamento_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    ap = Apartamento.query.get_or_404(apartamento_id)
+    numero = request.form.get('numero')
+    bloco = request.form.get('bloco')
+    if not numero:
+        flash('Informe o número do apartamento.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    ap.numero = numero
+    ap.bloco = bloco
+    db.session.commit()
+    flash('Apartamento atualizado com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+@app.route('/admin/apartamentos/<int:apartamento_id>/excluir', methods=['POST'])
+def excluir_apartamento(apartamento_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    ap = Apartamento.query.get_or_404(apartamento_id)
+    db.session.delete(ap)
+    db.session.commit()
+    flash('Apartamento excluído com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
 
 # Inicialização da aplicação
 if __name__ == '__main__':

@@ -125,7 +125,94 @@
                           {% else %}
                             <div class="d-flex flex-wrap gap-2 mb-2">
                               {% for ap in apartamentos_cond %}
-                                <span class="badge bg-secondary">Apto {{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</span>
+                                <div class="card card-body p-2 mb-2 me-2" style="min-width:220px;">
+                                  <div class="fw-semibold">Apto {{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</div>
+                                  <div class="small text-muted mb-1">Usuários vinculados:</div>
+                                  {% if ap.usuarios|length == 0 %}
+                                    <span class="text-danger small">Nenhum usuário vinculado.</span>
+                                  {% else %}
+                                    <div class="d-flex flex-wrap gap-1 mb-1">
+                                      {% for user in ap.usuarios %}
+                                        <span class="badge bg-primary d-flex align-items-center">
+                                          {{ user.nome }} ({{ user.tipo }})
+                                          <form method="POST" action="/admin/apartamentos/{{ ap.id }}/desvincular_usuario/{{ user.id }}" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" title="Desvincular" onclick="return confirm('Deseja desvincular este usuário do apartamento?');">
+                                              <i class="bi bi-x-circle"></i>
+                                            </button>
+                                          </form>
+                                        </span>
+                                      {% endfor %}
+                                    </div>
+                                  {% endif %}
+                                  <button class="btn btn-sm btn-outline-success mt-1" data-bs-toggle="modal" data-bs-target="#modalVincularUsuarioAp{{ ap.id }}">
+                                    <i class="bi bi-person-plus"></i> Vincular Usuário
+                                  </button>
+                                  <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarApartamento{{ ap.id }}">
+                                      <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                    <form method="POST" action="/admin/apartamentos/{{ ap.id }}/excluir" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este apartamento?');">
+                                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Excluir
+                                      </button>
+                                    </form>
+                                  </div>
+                                </div>
+                                <!-- Modal de vincular usuário ao apartamento -->
+                                <div class="modal fade" id="modalVincularUsuarioAp{{ ap.id }}" tabindex="-1" aria-labelledby="modalVincularUsuarioApLabel{{ ap.id }}" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <form method="POST" action="/admin/apartamentos/{{ ap.id }}/vincular_usuario">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="modalVincularUsuarioApLabel{{ ap.id }}">Vincular Usuário ao Apartamento</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <div class="mb-3">
+                                            <label class="form-label">Selecione o usuário</label>
+                                            <select class="form-select" name="usuario_id" required>
+                                              <option value="">Selecione...</option>
+                                              {% for user in usuarios if user not in ap.usuarios %}
+                                                <option value="{{ user.id }}">{{ user.nome }} ({{ user.tipo }})</option>
+                                              {% endfor %}
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                          <button type="submit" class="btn btn-primary">Vincular</button>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- Modal de edição de apartamento -->
+                                <div class="modal fade" id="modalEditarApartamento{{ ap.id }}" tabindex="-1" aria-labelledby="modalEditarApartamentoLabel{{ ap.id }}" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <form method="POST" action="/admin/apartamentos/{{ ap.id }}/editar">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="modalEditarApartamentoLabel{{ ap.id }}">Editar Apartamento</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <div class="mb-3">
+                                            <label class="form-label">Número do Apartamento</label>
+                                            <input type="text" class="form-control" name="numero" value="{{ ap.numero }}" required>
+                                          </div>
+                                          <div class="mb-3">
+                                            <label class="form-label">Bloco (opcional)</label>
+                                            <input type="text" class="form-control" name="bloco" value="{{ ap.bloco }}">
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                        </div>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
                               {% endfor %}
                             </div>
                           {% endif %}
