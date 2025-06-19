@@ -152,7 +152,7 @@
                                             <label class="form-label">Selecione o usuário</label>
                                             <select class="form-select" name="usuario_id" required>
                                               <option value="">Selecione...</option>
-                                              {% for user in usuarios if user not in ap.usuarios %}
+                                              {% for user in usuarios if user.tipo == 'Condomino' and user not in ap.usuarios %}
                                                 <option value="{{ user.id }}">{{ user.nome }} ({{ user.tipo }})</option>
                                               {% endfor %}
                                             </select>
@@ -241,62 +241,58 @@
                         </div>
                       </div>
                     </div>
-                    <!-- Modal de vincular usuário -->
-                    <div class="modal fade" id="modalVincularUsuario{{ cond.id }}" tabindex="-1" aria-labelledby="modalVincularUsuarioLabel{{ cond.id }}" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <form method="POST" action="/admin/condominios/vincular_usuario/{{ cond.id }}">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="modalVincularUsuarioLabel{{ cond.id }}">Vincular Usuário ao Condomínio</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <div class="mt-3">
+                          <div class="fw-semibold mb-1">Porteiros vinculados:</div>
+                          {% set porteiros_cond = usuarios|selectattr('tipo', 'equalto', 'Porteiro')|selectattr('condominio_id', 'equalto', cond.id)|list %}
+                          {% if porteiros_cond|length == 0 %}
+                            <span class="text-danger">Nenhum porteiro vinculado.</span>
+                          {% else %}
+                            <div class="d-flex flex-wrap gap-2">
+                              {% for user in porteiros_cond %}
+                                <span class="badge bg-primary d-flex align-items-center">
+                                  {{ user.nome }}
+                                  <form method="POST" action="/admin/condominios/desvincular_usuario/{{ cond.id }}/{{ user.id }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" title="Desvincular" onclick="return confirm('Deseja desvincular este porteiro do condomínio?');">
+                                      <i class="bi bi-x-circle"></i>
+                                    </button>
+                                  </form>
+                                </span>
+                              {% endfor %}
                             </div>
-                            <div class="modal-body">
-                              <div class="mb-3">
-                                <label class="form-label">Selecione o usuário</label>
-                                <select class="form-select" name="usuario_id" required>
-                                  <option value="">Selecione...</option>
-                                  {% for user in usuarios if not user.condominio_id or user.condominio_id != cond.id %}
-                                    <option value="{{ user.id }}">{{ user.nome }} ({{ user.tipo }})</option>
-                                  {% endfor %}
-                                </select>
-                              </div>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-primary">Vincular</button>
-                            </div>
-                          </form>
+                          {% endif %}
+                          <button class="btn btn-sm btn-outline-success mt-2" data-bs-toggle="modal" data-bs-target="#modalVincularUsuario{{ cond.id }}">
+                            <i class="bi bi-person-plus"></i> Vincular Porteiro
+                          </button>
                         </div>
-                      </div>
-                    </div>
-                    <!-- Modal de cadastro de apartamento -->
-                    <div class="modal fade" id="modalCadastrarApartamento{{ cond.id }}" tabindex="-1" aria-labelledby="modalCadastrarApartamentoLabel{{ cond.id }}" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <form method="POST" action="/admin/condominios/{{ cond.id }}/cadastrar_apartamento">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="modalCadastrarApartamentoLabel{{ cond.id }}">Cadastrar Apartamento</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                        <!-- Modal de vincular porteiro ao condomínio -->
+                        <div class="modal fade" id="modalVincularUsuario{{ cond.id }}" tabindex="-1" aria-labelledby="modalVincularUsuarioLabel{{ cond.id }}" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <form method="POST" action="/admin/condominios/vincular_usuario/{{ cond.id }}">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="modalVincularUsuarioLabel{{ cond.id }}">Vincular Porteiro ao Condomínio</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                    <label class="form-label">Selecione o porteiro</label>
+                                    <select class="form-select" name="usuario_id" required>
+                                      <option value="">Selecione...</option>
+                                      {% for user in usuarios if user.tipo == 'Porteiro' and (not user.condominio_id or user.condominio_id != cond.id) %}
+                                        <option value="{{ user.id }}">{{ user.nome }}</option>
+                                      {% endfor %}
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                  <button type="submit" class="btn btn-primary">Vincular</button>
+                                </div>
+                              </form>
                             </div>
-                            <div class="modal-body">
-                              <div class="mb-3">
-                                <label class="form-label">Número do Apartamento</label>
-                                <input type="text" class="form-control" name="numero" required>
-                              </div>
-                              <div class="mb-3">
-                                <label class="form-label">Bloco (opcional)</label>
-                                <input type="text" class="form-control" name="bloco">
-                              </div>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                              <button type="submit" class="btn btn-primary">Cadastrar</button>
-                            </div>
-                          </form>
+                          </div>
                         </div>
-                      </div>
                     </div>
-                  </div>
                   {% endfor %}
                 </div>
               {% endif %}

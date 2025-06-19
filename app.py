@@ -200,8 +200,9 @@ def painel_porteiro():
 
     usuario = Usuario.query.get(session['usuario_id'])
     condominio_id = usuario.condominio_id
-
-    # Cadastro de encomenda direto na tela inicial do porteiro
+    if not condominio_id:
+        flash('Você não está vinculado a nenhum condomínio. Solicite ao administrador.', 'danger')
+        return redirect(url_for('logout'))
     apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
     if request.method == 'POST':
         apartamento_id = request.form.get('apartamento_id')
@@ -427,6 +428,68 @@ def excluir_apartamento(apartamento_id):
     flash('Apartamento excluído com sucesso!', 'success')
     return redirect(url_for('admin_condominios'))
 
+# Rota para vincular usuário a condomínio (apenas para administradores)
+@app.route('/admin/condominios/vincular_usuario/<int:condominio_id>', methods=['POST'])
+def vincular_usuario_condominio(condominio_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    usuario_id = request.form.get('usuario_id')
+    if not usuario_id:
+        flash('Selecione um usuário para vincular.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    user = Usuario.query.get(usuario_id)
+    if not user or user.tipo != 'Porteiro':
+        flash('Apenas usuários do tipo Porteiro podem ser vinculados.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    user.condominio_id = condominio_id
+    db.session.commit()
+    flash(f'Porteiro {user.nome} vinculado ao condomínio com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+# Rota para desvincular usuário de condomínio (apenas para administradores)
+@app.route('/admin/condominios/desvincular_usuario/<int:condominio_id>/<int:usuario_id>', methods=['POST'])
+def desvincular_usuario_condominio(condominio_id, usuario_id):
+    if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
+        return redirect(url_for('login'))
+    user = Usuario.query.get(usuario_id)
+    if not user or user.condominio_id != condominio_id or user.tipo != 'Porteiro':
+        flash('Porteiro não encontrado ou não vinculado a este condomínio.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    user.condominio_id = None
+    db.session.commit()
+    flash(f'Porteiro {user.nome} desvinculado do condomínio com sucesso!', 'success')
+    return redirect(url_for('admin_condominios'))
+
+# Rota para registrar encomenda
+@app.route('/registrar-encomenda', methods=['GET', 'POST'])
+def registrar_encomenda():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    condominio_id = usuario.condominio_id
+    apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
+    if request.method == 'POST':
+        apartamento_id = request.form.get('apartamento_id')
+        nome = request.form.get('recipient_name')
+        descricao = request.form.get('descricao')
+        data_entrega = datetime.now().date()
+        nova_encomenda = Encomenda(
+            nome=nome,
+            descricao=descricao,
+            data_entrega=data_entrega,
+            apartamento_id=apartamento_id,
+            condominio_id=condominio_id,
+            registrado_por=usuario.id,
+            created_at=datetime.now(),
+            status='Registrada',
+            tamanho='Padrão'  # Ajuste conforme necessário
+        )
+        db.session.add(nova_encomenda)
+        db.session.commit()
+        flash('Encomenda registrada com sucesso!', 'success')
+        return redirect(url_for('painel_porteiro'))
+    return render_template('registrar_encomenda.html', usuario=usuario, apartamentos=apartamentos)
+
 # Configuração de notificações globais (simples, usando variáveis em memória para exemplo)
 notificacoes_globais = {
     'notificacoes_email': True,
@@ -615,9 +678,9 @@ def minhas_encomendas():
     encomendas = encomendas_query.all()
     return render_template('minhas_encomendas.html', usuario=usuario, encomendas=encomendas)
 
-# Rota para vincular usuário a condomínio (apenas para administradores)
-@app.route('/admin/condominios/vincular_usuario/<int:condominio_id>', methods=['POST'])
-def vincular_usuario_condominio(condominio_id):
+# Rota para vincular usuário a apartamento (apenas para administradores)
+@app.route('/admin/apartamentos/<int:apartamento_id>/vincular_usuario', methods=['POST'])
+def vincular_usuario_apartamento(apartamento_id):
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
     usuario_id = request.form.get('usuario_id')
@@ -625,57 +688,37 @@ def vincular_usuario_condominio(condominio_id):
         flash('Selecione um usuário para vincular.', 'danger')
         return redirect(url_for('admin_condominios'))
     user = Usuario.query.get(usuario_id)
-    if not user:
-        flash('Usuário não encontrado.', 'danger')
+    if not user or user.tipo != 'Condomino':
+        flash('Apenas usuários do tipo Condomino podem ser vinculados a apartamentos.', 'danger')
         return redirect(url_for('admin_condominios'))
-    user.condominio_id = condominio_id
-    db.session.commit()
-    flash(f'Usuário {user.nome} vinculado ao condomínio com sucesso!', 'success')
+    ap = Apartamento.query.get(apartamento_id)
+    if not ap:
+        flash('Apartamento não encontrado.', 'danger')
+        return redirect(url_for('admin_condominios'))
+    if user not in ap.usuarios:
+        ap.usuarios.append(user)
+        db.session.commit()
+        flash(f'Condomino {user.nome} vinculado ao apartamento com sucesso!', 'success')
+    else:
+        flash('Usuário já está vinculado a este apartamento.', 'warning')
     return redirect(url_for('admin_condominios'))
 
-# Rota para desvincular usuário de condomínio (apenas para administradores)
-@app.route('/admin/condominios/desvincular_usuario/<int:condominio_id>/<int:usuario_id>', methods=['POST'])
-def desvincular_usuario_condominio(condominio_id, usuario_id):
+@app.route('/admin/apartamentos/<int:apartamento_id>/desvincular_usuario/<int:usuario_id>', methods=['POST'])
+def desvincular_usuario_apartamento(apartamento_id, usuario_id):
     if 'usuario_id' not in session or session.get('tipo') != 'Administrador':
         return redirect(url_for('login'))
+    ap = Apartamento.query.get_or_404(apartamento_id)
     user = Usuario.query.get(usuario_id)
-    if not user or user.condominio_id != condominio_id:
-        flash('Usuário não encontrado ou não vinculado a este condomínio.', 'danger')
+    if not ap or not user or user.tipo != 'Condomino':
+        flash('Condomino não encontrado ou não vinculado a este apartamento.', 'danger')
         return redirect(url_for('admin_condominios'))
-    user.condominio_id = None
-    db.session.commit()
-    flash(f'Usuário {user.nome} desvinculado do condomínio com sucesso!', 'success')
-    return redirect(url_for('admin_condominios'))
-
-# Rota para registrar encomenda
-@app.route('/registrar-encomenda', methods=['GET', 'POST'])
-def registrar_encomenda():
-    if 'usuario_id' not in session:
-        return redirect(url_for('login'))
-    usuario = Usuario.query.get(session['usuario_id'])
-    condominio_id = usuario.condominio_id
-    apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
-    if request.method == 'POST':
-        apartamento_id = request.form.get('apartamento_id')
-        nome = request.form.get('recipient_name')
-        descricao = request.form.get('descricao')
-        data_entrega = datetime.now().date()
-        nova_encomenda = Encomenda(
-            nome=nome,
-            descricao=descricao,
-            data_entrega=data_entrega,
-            apartamento_id=apartamento_id,
-            condominio_id=condominio_id,
-            registrado_por=usuario.id,
-            created_at=datetime.now(),
-            status='Registrada',
-            tamanho='Padrão'  # Ajuste conforme necessário
-        )
-        db.session.add(nova_encomenda)
+    if user in ap.usuarios:
+        ap.usuarios.remove(user)
         db.session.commit()
-        flash('Encomenda registrada com sucesso!', 'success')
-        return redirect(url_for('painel_porteiro'))
-    return render_template('registrar_encomenda.html', usuario=usuario, apartamentos=apartamentos)
+        flash(f'Condomino {user.nome} desvinculado do apartamento com sucesso!', 'success')
+    else:
+        flash('Usuário não está vinculado a este apartamento.', 'warning')
+    return redirect(url_for('admin_condominios'))
 
 # Inicialização da aplicação
 if __name__ == '__main__':
