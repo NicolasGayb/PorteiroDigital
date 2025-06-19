@@ -43,7 +43,7 @@ class Usuario(db.Model):
     senha = db.Column(db.String(200), nullable=False)
     tipo = db.Column(db.String(50), nullable=False)  # Tipos: Administrador, Dono do prédio, Zelador, Condomino
     destinatario = db.Column(db.String(100), nullable=False)  # Destinatário será sempre igual ao nome completo
-    # condominio_id removido
+    condominio_id = db.Column(db.Integer, db.ForeignKey('condominio.id'), nullable=True)  # Só usado para porteiros
     apartamentos = db.relationship('Apartamento', secondary=apartamento_usuario, back_populates='usuarios')
 
     # Garante que destinatario sempre seja igual ao nome ao criar ou editar um usuário
@@ -87,6 +87,7 @@ class Condominio(db.Model):
     cidade = db.Column(db.String(100), nullable=False)
     estado = db.Column(db.String(50), nullable=False)
     cep = db.Column(db.String(20), nullable=False)
+    porteiros = db.relationship('Usuario', backref='condominio', lazy='dynamic', primaryjoin="and_(Condominio.id==Usuario.condominio_id, Usuario.tipo=='Porteiro')")
 
 # Modelo de Perfil de Usuário
 class Perfil(db.Model):
