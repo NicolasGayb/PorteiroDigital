@@ -98,8 +98,8 @@
                   <tbody>
                     {% for entrega in entregas %}
                     <tr>
-                      <td>{{ entrega.recipient_name }}</td>
-                      <td>{{ entrega.apartment }}</td>
+                      <td>{{ entrega.nome }}</td>
+                      <td>{% set ap = apartamentos|selectattr('id', 'equalto', entrega.apartamento_id)|first %}{{ ap.numero if ap else entrega.apartamento_id }}</td>
                       <td>{{ entrega.descricao }}</td>
                       <td>{{ entrega.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
                     </tr>
@@ -131,8 +131,8 @@
                   <tbody>
                     {% for encomenda in encomendas_mes %}
                     <tr>
-                      <td>{{ encomenda.recipient_name }}</td>
-                      <td>{{ encomenda.apartment }}</td>
+                      <td>{{ encomenda.nome }}</td>
+                      <td>{% set ap = apartamentos|selectattr('id', 'equalto', encomenda.apartamento_id)|first %}{{ ap.numero if ap else encomenda.apartamento_id }}</td>
                       <td>{{ encomenda.descricao }}</td>
                       <td>{{ encomenda.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
                     </tr>
