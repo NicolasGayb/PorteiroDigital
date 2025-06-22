@@ -1,4 +1,4 @@
-<!-- painel_porteiro.html modernizado -->
+<!-- painel_porteiro.html modernizado e mais bonito -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,28 +8,65 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body { background: linear-gradient(120deg, #e0e7ff 0%, #f4f4f4 100%); }
+    .main-card {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(76, 110, 245, 0.08);
+      padding: 2.5rem 2rem 2rem 2rem;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      transition: box-shadow 0.2s;
+    }
+    .main-card:hover {
+      box-shadow: 0 12px 40px rgba(76, 110, 245, 0.13);
+    }
+    .form-label { font-weight: 500; }
+    .btn-primary {
+      background: linear-gradient(90deg, #4da3ff 0%, #2563eb 100%);
+      border: none;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(90deg, #2563eb 0%, #4da3ff 100%);
+    }
+    .sidebar-header {
+      font-size: 1.7rem;
+      color: #2563eb;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .sidebar {
+      background: #fff;
+      border-radius: 0 24px 24px 0;
+      box-shadow: 2px 0 16px rgba(76, 110, 245, 0.07);
+    }
+    @media (max-width: 900px) {
+      .main-card { padding: 1.5rem 0.5rem; }
+      .sidebar { border-radius: 0; }
+    }
+  </style>
 </head>
-<body style="background: #f4f4f4;">
+<body>
   <div class="d-flex" style="min-height: 100vh;">
     <!-- Sidebar Lateral -->
-    <nav class="bg-white border-end shadow-sm d-flex flex-column justify-content-between" style="width: 260px; min-height: 100vh; position:relative;">
+    <nav class="sidebar border-end shadow-sm d-flex flex-column justify-content-between" style="width: 260px; min-height: 100vh; position:relative;">
       <div>
         <div class="d-flex align-items-center gap-2 px-4 pt-4 pb-3">
-          <i class="bi bi-building" style="font-size: 2rem; color: #4da3ff;"></i>
-          <span class="fw-bold" style="color: #4da3ff; font-size: 1.5rem;">Portaria Link</span>
+          <i class="bi bi-building" style="font-size: 2.2rem; color: #2563eb;"></i>
+          <span class="sidebar-header">Portaria Digital</span>
         </div>
         <ul class="nav flex-column mt-3">
           <li class="nav-item">
-            <a class="nav-link active fw-semibold" href="/painel/porteiro" style="color: #4da3ff;"><i class="bi bi-house-door me-2"></i>Início</a>
+            <a class="nav-link active fw-semibold" href="/painel/porteiro" style="color: #2563eb;"><i class="bi bi-house-door me-2"></i>Início</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark" href="#registrar-encomenda"><i class="bi bi-box-seam me-2"></i>Registrar Encomenda</a>
+            <a class="nav-link text-dark" href="/painel/porteiro/historico"><i class="bi bi-clock-history me-2"></i>Histórico de Encomendas</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark" href="#"><i class="bi bi-clock-history me-2"></i>Histórico de Encomendas</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-dark" href="#todas-encomendas"><i class="bi bi-list-ul me-2"></i>Encomendas do Mês</a>
+            <a class="nav-link text-dark" href="/painel/porteiro/mes"><i class="bi bi-list-ul me-2"></i>Encomendas do Mês</a>
           </li>
         </ul>
         <div class="flex-grow-1"></div>
@@ -48,134 +85,56 @@
       </footer>
     </nav>
     <!-- Conteúdo principal -->
-    <main class="flex-grow-1 px-4 py-4">
-      <div class="mb-4">
-        <h2 class="fw-bold mb-1" style="font-size:2rem;">Painel do Porteiro</h2>
-        <div class="text-muted" style="font-size:1.1rem;">Cadastre e acompanhe as encomendas do condomínio.</div>
+    <main class="flex-grow-1 px-4 py-4 d-flex flex-column align-items-center justify-content-center">
+      <div class="mb-4 text-center">
+        <h2 class="fw-bold mb-1" style="font-size:2.2rem; color:#2563eb;">Painel do Porteiro</h2>
+        <div class="text-muted" style="font-size:1.15rem;">Cadastre e acompanhe as encomendas do condomínio.</div>
       </div>
-      <div class="row g-4 mb-3">
-        <div class="col-lg-6">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="fw-bold mb-3" id="registrar-encomenda">Registrar nova encomenda</h5>
-              <form method="POST" action="">
-                <div class="mb-3">
-                  <label class="form-label">Nome do destinatário</label>
-                  <input type="text" class="form-control" name="recipient_name" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Apartamento</label>
-                  <select class="form-control" name="apartamento_id" required>
-                    <option value="">Selecione...</option>
-                    {% for ap in apartamentos %}
-                      <option value="{{ ap.id }}">{{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Descrição</label>
-                  <input type="text" class="form-control" name="descricao" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Registrar Encomenda</button>
-              </form>
-            </div>
+      <div class="main-card mx-auto" style="max-width: 480px; width:100%;">
+        <h5 class="fw-bold mb-3 text-center" id="registrar-encomenda">Registrar nova encomenda</h5>
+        <form method="POST" action="">
+          <div class="mb-3">
+            <label class="form-label">Nome do destinatário</label>
+            <input type="text" class="form-control form-control-lg rounded-3" name="recipient_name" required autocomplete="off">
           </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="fw-bold mb-3">Histórico de Encomendas</h5>
-              <div class="table-responsive">
-                <table class="table align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Destinatário</th>
-                      <th>Apto</th>
-                      <th>Descrição</th>
-                      <th>Data/Hora Registro</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for entrega in entregas %}
-                    <tr>
-                      <td>{{ entrega.nome }}</td>
-                      <td>{% set ap = apartamentos|selectattr('id', 'equalto', entrega.apartamento_id)|first %}{{ ap.numero if ap else entrega.apartamento_id }}</td>
-                      <td>{{ entrega.descricao }}</td>
-                      <td>{{ entrega.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="4" class="text-center text-muted">Nenhuma encomenda registrada.</td></tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div class="mb-3">
+            <label class="form-label">Apartamento</label>
+            <select class="form-control form-control-lg rounded-3" name="apartamento_id" required>
+              <option value="">Selecione...</option>
+              {% for ap in apartamentos %}
+                <option value="{{ ap.id }}">{{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</option>
+              {% endfor %}
+            </select>
           </div>
-        </div>
-      </div>
-      <div class="row g-4 mb-3">
-        <div class="col-lg-12">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="fw-bold mb-3" id="todas-encomendas">Encomendas do Condomínio - Este Mês</h5>
-              <div class="table-responsive">
-                <table class="table align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Destinatário</th>
-                      <th>Apto</th>
-                      <th>Descrição</th>
-                      <th>Data/Hora Registro</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for encomenda in encomendas_mes %}
-                    <tr>
-                      <td>{{ encomenda.nome }}</td>
-                      <td>{% set ap = apartamentos|selectattr('id', 'equalto', encomenda.apartamento_id)|first %}{{ ap.numero if ap else encomenda.apartamento_id }}</td>
-                      <td>{{ encomenda.descricao }}</td>
-                      <td>{{ encomenda.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="4" class="text-center text-muted">Nenhuma encomenda registrada neste mês.</td></tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <input type="text" class="form-control form-control-lg rounded-3" name="descricao" required autocomplete="off">
           </div>
-        </div>
-      </div>
-      <div class="row justify-content-center mb-4">
-        <div class="col-12 col-md-8 col-lg-5">
-          <div class="card border-0 shadow-sm rounded-4 p-2" style="background: #fff;">
-            <div class="card-body">
-              <h5 class="fw-bold mb-3 text-center" id="registrar-encomenda">Registrar nova encomenda</h5>
-              <form method="POST" action="">
-                <div class="mb-3">
-                  <label class="form-label">Nome do destinatário</label>
-                  <input type="text" class="form-control form-control-lg rounded-3" name="recipient_name" required autocomplete="off">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Apartamento</label>
-                  <select class="form-control form-control-lg rounded-3" name="apartamento_id" required>
-                    <option value="">Selecione...</option>
-                    {% for ap in apartamentos %}
-                      <option value="{{ ap.id }}">{{ ap.numero }}{% if ap.bloco %} - Bloco {{ ap.bloco }}{% endif %}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Descrição</label>
-                  <input type="text" class="form-control form-control-lg rounded-3" name="descricao" required autocomplete="off">
-                </div>
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-primary btn-lg rounded-3">Registrar Encomenda</button>
-                </div>
-              </form>
-            </div>
+          <div class="mb-3">
+            <label class="form-label">Tamanho</label>
+            <select class="form-control form-control-lg rounded-3" name="tamanho" required>
+              <option value="">Selecione...</option>
+              <option value="Grande">Grande</option>
+              <option value="Médio">Médio</option>
+              <option value="Pequeno">Pequeno</option>
+            </select>
           </div>
-        </div>
+          <div class="mb-3">
+            <label class="form-label">Remetente</label>
+            <input type="text" class="form-control form-control-lg rounded-3" name="remetente" required autocomplete="off">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-control form-control-lg rounded-3" name="status" required>
+              <option value="Registrada">Registrada</option>
+              <option value="Entregue">Entregue</option>
+              <option value="Retida">Retida</option>
+            </select>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg rounded-3">Registrar Encomenda</button>
+          </div>
+        </form>
       </div>
     </main>
   </div>

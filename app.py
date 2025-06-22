@@ -12,7 +12,7 @@ from sqlalchemy import func
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "sua_chave_secreta_aqui")
+app.secret_key = os.environ.get("SECRET_KEY", "f9794496ca750616d60715ca54f14692")
 
 # Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///usuarios.db")
@@ -22,8 +22,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'seu_email@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'sua_senha_do_gmail')
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'digitalporteiro@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'ajow vqig aptc yvih')
 
 db = SQLAlchemy(app)
 mail = Mail(app)
@@ -94,6 +94,7 @@ class Perfil(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), unique=True, nullable=False)
     descricao = db.Column(db.String(200), nullable=True)
+    permissoes = db.Column(db.Text, nullable=True)  # JSON com menus liberados
 
 # Modelo de Log
 class Log(db.Model):
@@ -210,6 +211,9 @@ def painel_porteiro():
         apartamento_id = request.form.get('apartamento_id')
         nome = request.form.get('recipient_name')
         descricao = request.form.get('descricao')
+        tamanho = request.form.get('tamanho')
+        remetente = request.form.get('remetente')
+        status = request.form.get('status')
         data_entrega = datetime.now().date()
         nova_encomenda = Encomenda(
             nome=nome,
@@ -219,8 +223,9 @@ def painel_porteiro():
             condominio_id=condominio_id,
             registrado_por=usuario.id,
             created_at=datetime.now(),
-            status='Registrada',
-            tamanho='Padrão'  # Ajuste conforme necessário
+            status=status,  # Agora pega do formulário
+            tamanho=tamanho,  # Agora pega do formulário
+            remetente=remetente  # Novo campo
         )
         db.session.add(nova_encomenda)
         db.session.commit()
@@ -234,7 +239,7 @@ def painel_porteiro():
                         sender=app.config['MAIL_USERNAME'],
                         recipients=[morador.email]
                     )
-                    msg.body = f'Olá {morador.nome},\n\nUma nova encomenda foi registrada para seu apartamento ({ap.numero}{f" - Bloco {ap.bloco}" if ap.bloco else ""}) no condomínio.\nDescrição: {descricao}\n\nRetire sua encomenda na portaria.\n\nAtenciosamente,\nEquipe Portaria Link'
+                    msg.body = f'Olá {morador.nome},\n\nUma nova encomenda foi registrada para seu apartamento ({ap.numero}{f" - Bloco {ap.bloco}" if ap.bloco else ""}) no condomínio.\nDescrição: {descricao}\n\nRetire sua encomenda na portaria.\n\nAtenciosamente,\nEquipe Porteiro Digital'
                     mail.send(msg)
                 except Exception as e:
                     print(f'Erro ao enviar e-mail para {morador.email}:', e)
@@ -258,6 +263,30 @@ def painel_porteiro():
         encomendas_mes=encomendas_mes,
         apartamentos=apartamentos
     )
+
+@app.route('/painel/porteiro/historico')
+def historico_encomendas():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    condominio_id = usuario.condominio_id
+    apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
+    entregas = Encomenda.query.filter_by(registrado_por=usuario.id).order_by(Encomenda.created_at.desc()).all()
+    return render_template('historico_encomendas.html', usuario=usuario, entregas=entregas, apartamentos=apartamentos)
+
+@app.route('/painel/porteiro/mes')
+def encomendas_mes():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    usuario = Usuario.query.get(session['usuario_id'])
+    condominio_id = usuario.condominio_id
+    apartamentos = Apartamento.query.filter_by(condominio_id=condominio_id).all()
+    now = datetime.now()
+    encomendas_mes = Encomenda.query.filter(
+        Encomenda.condominio_id == condominio_id,
+        Encomenda.created_at >= datetime(now.year, now.month, 1)
+    ).order_by(Encomenda.created_at.desc()).all()
+    return render_template('encomendas_mes.html', usuario=usuario, encomendas_mes=encomendas_mes, apartamentos=apartamentos)
 
 # Painel do Condômino
 @app.route('/painel/condomino')
@@ -495,6 +524,9 @@ def registrar_encomenda():
         apartamento_id = request.form.get('apartamento_id')
         nome = request.form.get('recipient_name')
         descricao = request.form.get('descricao')
+        tamanho = request.form.get('tamanho')
+        remetente = request.form.get('remetente')
+        status = request.form.get('status')
         data_entrega = datetime.now().date()
         nova_encomenda = Encomenda(
             nome=nome,
@@ -504,8 +536,9 @@ def registrar_encomenda():
             condominio_id=condominio_id,
             registrado_por=usuario.id,
             created_at=datetime.now(),
-            status='Registrada',
-            tamanho='Padrão'  # Ajuste conforme necessário
+            status=status,  # Agora pega do formulário
+            tamanho=tamanho,  # Agora pega do formulário
+            remetente=remetente  # Novo campo
         )
         db.session.add(nova_encomenda)
         db.session.commit()
@@ -565,18 +598,29 @@ def admin_configuracoes():
                     usuarios
                 )
                 flash('Notificações enviadas por e-mail para todos os usuários.', 'info')
-        else:
+        elif 'perfil_id' in request.form and 'menus[]' in request.form:
             perfil_id = request.form.get('perfil_id')
+            menus = request.form.getlist('menus[]')
+            perfil = Perfil.query.get(perfil_id)
+            if perfil:
+                import json
+                perfil.permissoes = json.dumps(menus)
+                db.session.commit()
+                flash('Permissões/menus atualizados com sucesso!', 'success')
+            return redirect(url_for('admin_configuracoes'))
+        else:
             nome = request.form.get('nome')
             descricao = request.form.get('descricao')
-            if perfil_id:  # Editar perfil existente
-                perfil = Perfil.query.get(perfil_id)
+            if request.form.get('perfil_id'):
+                perfil = Perfil.query.get(request.form.get('perfil_id'))
                 if perfil:
-                    perfil.nome = nome
-                    perfil.descricao = descricao
+                    if nome:
+                        perfil.nome = nome
+                    if descricao is not None:
+                        perfil.descricao = descricao
                     db.session.commit()
                     flash('Perfil atualizado com sucesso!', 'success')
-            else:  # Criar novo perfil
+            else:
                 if Perfil.query.filter_by(nome=nome).first():
                     flash('Já existe um perfil com esse nome.', 'danger')
                 else:
@@ -584,14 +628,34 @@ def admin_configuracoes():
                     db.session.add(novo_perfil)
                     db.session.commit()
                     flash('Perfil criado com sucesso!', 'success')
-        return redirect(url_for('admin_configuracoes'))
+            return redirect(url_for('admin_configuracoes'))
     perfis = Perfil.query.all()
+    # Decodifica as permissões para exibir como lista
+    import json
+    for perfil in perfis:
+        if perfil.permissoes:
+            try:
+                perfil.permissoes = json.loads(perfil.permissoes)
+            except Exception:
+                perfil.permissoes = []
+        else:
+            perfil.permissoes = []
+    # Cria lista serializável para o JS
+    perfis_js = [
+        {
+            'id': perfil.id,
+            'nome': perfil.nome,
+            'descricao': perfil.descricao,
+            'permissoes': perfil.permissoes
+        } for perfil in perfis
+    ]
     logs = Log.query.order_by(Log.data_hora.desc()).limit(50).all()
     historico_notificacoes = NotificacaoEnviada.query.order_by(NotificacaoEnviada.data_hora.desc()).limit(50).all()
     return render_template(
         'admin_configuracoes.html',
         usuario=usuario,
         perfis=perfis,
+        perfis_js=perfis_js,
         logs=logs,
         notificacoes_email=notificacoes_globais['notificacoes_email'],
         notificacoes_encomenda=notificacoes_globais['notificacoes_encomenda'],

@@ -1,0 +1,127 @@
+PORTARIA DIGITAL: SISTEMA DE GESTÃO DE ENCOMENDAS E USUÁRIOS PARA CONDOMÍNIOS
+
+Trabalho de Conclusão de Curso apresentado ao Curso de [Seu Curso] da [Sua Instituição], como requisito parcial para obtenção do título de [Seu Grau].
+
+Orientador: Prof. [Nome do Orientador]
+
+[Seu Nome]
+[Local]
+[Data]
+
+RESUMO
+O presente trabalho apresenta o desenvolvimento do sistema Portaria Digital, uma solução web para gestão de encomendas, usuários e permissões em condomínios residenciais. O sistema visa modernizar o controle de entregas, facilitar a comunicação entre porteiros, moradores, síndicos e administradores, e garantir maior segurança e rastreabilidade das operações. O projeto utiliza tecnologias como Python, Flask, PostgreSQL e Bootstrap, priorizando usabilidade, segurança e flexibilidade.
+
+Palavras-chave: Portaria, Encomendas, Condomínio, Sistema Web, Gestão.
+
+ABSTRACT
+This work presents the development of Portaria Digital, a web system for managing deliveries, users, and permissions in residential condominiums. The system aims to modernize delivery control, facilitate communication between doormen, residents, managers, and administrators, and ensure greater security and traceability of operations. The project uses technologies such as Python, Flask, PostgreSQL, and Bootstrap, prioritizing usability, security, and flexibility.
+
+Keywords: Doorman, Deliveries, Condominium, Web System, Management.
+
+SUMÁRIO
+1 INTRODUÇÃO
+2 OBJETIVOS
+3 FUNDAMENTAÇÃO TEÓRICA
+4 METODOLOGIA
+5 DESENVOLVIMENTO
+6 RESULTADOS ESPERADOS
+7 CONCLUSÃO
+8 REFERÊNCIAS
+9 ANEXOS
+
+1 INTRODUÇÃO
+A gestão de encomendas em condomínios é um desafio crescente devido ao aumento do volume de entregas e à necessidade de segurança. O Portaria Digital surge como uma solução tecnológica para organizar, registrar e controlar o fluxo de encomendas, além de facilitar a comunicação entre os diferentes perfis de usuários do condomínio. O sistema foi motivado pela observação de problemas recorrentes em condomínios, como extravio de encomendas, falta de controle e comunicação ineficiente.
+
+2 OBJETIVOS
+2.1 Objetivo Geral
+Desenvolver um sistema web para gestão de encomendas e usuários em condomínios, com controle de permissões e histórico de operações.
+
+2.2 Objetivos Específicos
+- Permitir o registro e acompanhamento de encomendas.
+- Gerenciar diferentes perfis de usuários (administrador, síndico, porteiro, condômino).
+- Controlar permissões de acesso a menus e funcionalidades.
+- Gerar logs e relatórios de auditoria.
+- Facilitar a comunicação entre os usuários do sistema.
+
+3 FUNDAMENTAÇÃO TEÓRICA
+A fundamentação teórica aborda conceitos de sistemas web, segurança da informação, gestão condominial, frameworks Python/Flask, banco de dados relacional (PostgreSQL), usabilidade e normas ABNT. Destaca-se a importância de sistemas informatizados para a eficiência operacional e a segurança em ambientes residenciais.
+
+4 METODOLOGIA
+O desenvolvimento seguiu a metodologia incremental, com as seguintes etapas:
+- Levantamento de requisitos junto a usuários reais.
+- Modelagem de dados e definição dos perfis de usuário.
+- Implementação do backend em Python/Flask.
+- Implementação do frontend com HTML, CSS e Bootstrap.
+- Integração com banco de dados PostgreSQL.
+- Testes de usabilidade e segurança.
+- Documentação e ajustes finais.
+
+5 DESENVOLVIMENTO
+5.1 Estrutura do Sistema
+O sistema é composto por módulos de cadastro e autenticação de usuários, registro e consulta de encomendas, painéis específicos para cada perfil, controle de permissões via campo JSON no modelo Perfil, geração de logs e notificações.
+
+5.2 Tecnologias Utilizadas
+- Python 3.x
+- Flask (framework web)
+- SQLAlchemy (ORM)
+- PostgreSQL (banco de dados)
+- Bootstrap 5 (frontend responsivo)
+- HTML5, CSS3, JavaScript
+- Docker (opcional para deploy)
+
+5.3 Justificativa das Tecnologias
+O Flask foi escolhido por sua simplicidade e flexibilidade para projetos web de pequeno e médio porte. O PostgreSQL foi selecionado pela robustez e recursos avançados de banco de dados relacional. O Bootstrap garante responsividade e rapidez no desenvolvimento do frontend.
+
+5.4 Fluxo de Uso do Sistema
+1. O porteiro registra uma nova encomenda, vinculando-a ao morador/apartamento.
+2. O sistema notifica o morador e registra o evento no log.
+3. O administrador pode consultar logs, editar permissões e gerenciar usuários.
+4. Cada perfil tem menus e funcionalidades liberadas conforme suas permissões.
+
+5.5 Tabela de Requisitos Funcionais
+| Código | Requisito                                   | Prioridade |
+|--------|---------------------------------------------|------------|
+| RF01   | Cadastro de usuários                       | Alta       |
+| RF02   | Registro de encomendas                     | Alta       |
+| RF03   | Consulta de histórico de encomendas         | Média      |
+| RF04   | Controle de permissões por perfil           | Alta       |
+| RF05   | Geração de logs de auditoria                | Média      |
+| RF06   | Notificações para moradores                 | Média      |
+
+5.6 Requisitos Não Funcionais
+- Segurança de dados (hash de senhas, controle de sessão)
+- Interface responsiva
+- Compatibilidade com navegadores modernos
+- Facilidade de manutenção e expansão
+
+5.7 Análise de Segurança e Usabilidade
+O sistema utiliza hash de senhas, validação de permissões e logs de operações. A interface foi testada com usuários reais para garantir facilidade de uso.
+
+5.8 Sugestões de Melhorias Futuras
+- Integração com aplicativos móveis.
+- Notificações via WhatsApp/SMS.
+- Relatórios gráficos de entregas.
+- Integração com sistemas de portaria eletrônica.
+
+6 RESULTADOS ESPERADOS
+- Redução de extravios e aumento da segurança nas entregas.
+- Facilidade de uso para todos os perfis.
+- Histórico detalhado de operações.
+- Flexibilidade para adaptações futuras.
+
+7 CONCLUSÃO
+O Portaria Digital atende à demanda por modernização da gestão de encomendas em condomínios, promovendo organização, segurança e praticidade. O sistema é flexível, seguro e pode ser expandido para novas funcionalidades.
+
+8 REFERÊNCIAS
+[Inclua aqui livros, artigos, sites e normas ABNT consultados. Exemplo:]
+- PRESSMAN, R. S. Engenharia de Software. 8. ed. São Paulo: McGraw Hill, 2016.
+- FLASK. Documentação oficial. Disponível em: https://flask.palletsprojects.com/
+- POSTGRESQL. Documentação oficial. Disponível em: https://www.postgresql.org/docs/
+- NBR 14724:2011. Informação e documentação – Trabalhos acadêmicos – Apresentação.
+
+9 ANEXOS
+A. Estrutura de diretórios do projeto
+B. Prints das telas principais
+C. Scripts SQL de criação do banco
+
+[Adapte os campos entre colchetes com seus dados e personalize conforme sua instituição. Para gerar o PDF, abra este arquivo no Word e exporte como PDF.]

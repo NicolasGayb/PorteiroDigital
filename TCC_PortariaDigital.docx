@@ -1,0 +1,78 @@
+PORTARIA DIGITAL: SISTEMA DE GESTÃO DE ENCOMENDAS E USUÁRIOS PARA CONDOMÍNIOS
+
+Trabalho de Conclusão de Curso apresentado ao Curso de [Seu Curso] da [Sua Instituição], como requisito parcial para obtenção do título de [Seu Grau].
+
+Orientador: Prof. [Nome do Orientador]
+
+[Seu Nome]
+[Local]
+[Data]
+
+RESUMO
+O presente trabalho apresenta o desenvolvimento do sistema Portaria Digital, uma solução web para gestão de encomendas, usuários e permissões em condomínios residenciais. O sistema visa modernizar o controle de entregas, facilitar a comunicação entre porteiros, moradores, síndicos e administradores, e garantir maior segurança e rastreabilidade das operações.
+
+Palavras-chave: Portaria, Encomendas, Condomínio, Sistema Web, Gestão.
+
+ABSTRACT
+This work presents the development of Portaria Digital, a web system for managing deliveries, users, and permissions in residential condominiums. The system aims to modernize delivery control, facilitate communication between doormen, residents, managers, and administrators, and ensure greater security and traceability of operations.
+
+Keywords: Doorman, Deliveries, Condominium, Web System, Management.
+
+SUMÁRIO
+1 INTRODUÇÃO
+2 OBJETIVOS
+3 FUNDAMENTAÇÃO TEÓRICA
+4 METODOLOGIA
+5 DESENVOLVIMENTO
+6 RESULTADOS ESPERADOS
+7 CONCLUSÃO
+8 REFERÊNCIAS
+
+1 INTRODUÇÃO
+A gestão de encomendas em condomínios é um desafio crescente devido ao aumento do volume de entregas e à necessidade de segurança. O Portaria Digital surge como uma solução tecnológica para organizar, registrar e controlar o fluxo de encomendas, além de facilitar a comunicação entre os diferentes perfis de usuários do condomínio.
+
+2 OBJETIVOS
+2.1 Objetivo Geral
+Desenvolver um sistema web para gestão de encomendas e usuários em condomínios, com controle de permissões e histórico de operações.
+
+2.2 Objetivos Específicos
+- Permitir o registro e acompanhamento de encomendas.
+- Gerenciar diferentes perfis de usuários (administrador, síndico, porteiro, condômino).
+- Controlar permissões de acesso a menus e funcionalidades.
+- Gerar logs e relatórios de auditoria.
+
+3 FUNDAMENTAÇÃO TEÓRICA
+Aborda conceitos de sistemas web, segurança da informação, gestão condominial, frameworks Python/Flask, banco de dados relacional (PostgreSQL) e normas de usabilidade.
+
+4 METODOLOGIA
+O desenvolvimento seguiu a metodologia incremental, com levantamento de requisitos, modelagem de dados, implementação backend (Flask/Python), frontend (HTML, CSS, Bootstrap), integração com banco PostgreSQL e testes.
+
+5 DESENVOLVIMENTO
+O sistema foi estruturado em módulos:
+- Cadastro e autenticação de usuários.
+- Registro e consulta de encomendas.
+- Painéis específicos para cada perfil (admin, síndico, porteiro, condômino).
+- Controle de permissões via campo JSON no modelo Perfil.
+- Interface responsiva e moderna.
+- Geração de logs e notificações.
+
+A estrutura de pastas inclui arquivos Python para backend, templates HTML para frontend, arquivos estáticos (CSS, JS, imagens) e scripts de banco de dados.
+
+6 RESULTADOS ESPERADOS
+- Redução de extravios e aumento da segurança nas entregas.
+- Facilidade de uso para todos os perfis.
+- Histórico detalhado de operações.
+- Flexibilidade para adaptações futuras.
+
+7 CONCLUSÃO
+O Portaria Digital atende à demanda por modernização da gestão de encomendas em condomínios, promovendo organização, segurança e praticidade.
+
+8 REFERÊNCIAS
+[Inclua aqui livros, artigos, sites e normas ABNT consultados.]
+
+ANEXOS
+- Estrutura de diretórios do projeto.
+- Prints das telas principais.
+- Scripts SQL de criação do banco.
+
+[Adapte os campos entre colchetes com seus dados e personalize conforme sua instituição. Para gerar o PDF, abra este arquivo no Word e exporte como PDF.]
