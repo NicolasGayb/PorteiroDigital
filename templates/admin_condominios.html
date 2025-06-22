@@ -202,6 +202,33 @@
                         </div>
                       </div>
                     </div>
+                    <!-- Modal de cadastro de apartamento -->
+                    <div class="modal fade" id="modalCadastrarApartamento{{ cond.id }}" tabindex="-1" aria-labelledby="modalCadastrarApartamentoLabel{{ cond.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <form method="POST" action="/admin/condominios/{{ cond.id }}/cadastrar_apartamento">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="modalCadastrarApartamentoLabel{{ cond.id }}">Cadastrar Apartamento</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="mb-3">
+                                <label class="form-label">Número do Apartamento</label>
+                                <input type="text" class="form-control" name="numero" required>
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label">Bloco (opcional)</label>
+                                <input type="text" class="form-control" name="bloco">
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="submit" class="btn btn-primary">Cadastrar</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
                     <!-- Modal de edição -->
                     <div class="modal fade" id="modalEditarCondominio{{ cond.id }}" tabindex="-1" aria-labelledby="modalLabel{{ cond.id }}" aria-hidden="true">
                       <div class="modal-dialog">

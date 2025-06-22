@@ -182,7 +182,8 @@ def painel():
         return redirect(url_for('login'))
 
     tipo = session['tipo']
-    if tipo == 'Porteiro':
+    # Aceita tanto 'Porteiro' quanto 'Zelador' para compatibilidade
+    if tipo in ['Porteiro', 'Zelador']:
         return redirect(url_for('painel_porteiro'))
     elif tipo == 'Condomino':
         return redirect(url_for('painel_condomino'))
@@ -252,8 +253,15 @@ def painel_condomino():
 
     usuario = Usuario.query.get(session['usuario_id'])
 
-    # Busca as encomendas do usuário logado
-    encomendas = Encomenda.query.filter_by(usuario_id=usuario.id).all()
+    # Busca os apartamentos do usuário (condomino pode estar em mais de um)
+    apartamentos_ids = [ap.id for ap in usuario.apartamentos]
+    condominio_ids = list(set([ap.condominio_id for ap in usuario.apartamentos]))
+
+    # Busca as encomendas apenas dos apartamentos e condomínios que o usuário está vinculado
+    encomendas = Encomenda.query.filter(
+        Encomenda.apartamento_id.in_(apartamentos_ids),
+        Encomenda.condominio_id.in_(condominio_ids)
+    ).order_by(Encomenda.data_entrega.desc()).all()
 
     return render_template('painel_condomino.html', usuario=usuario, encomendas=encomendas)
 
