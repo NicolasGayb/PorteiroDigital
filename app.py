@@ -224,7 +224,21 @@ def painel_porteiro():
         )
         db.session.add(nova_encomenda)
         db.session.commit()
-        flash('Encomenda registrada com sucesso!', 'success')
+        # Notificação automática para moradores do apartamento
+        ap = Apartamento.query.get(apartamento_id)
+        if ap:
+            for morador in ap.usuarios:
+                try:
+                    msg = Message(
+                        subject='Nova encomenda recebida',
+                        sender=app.config['MAIL_USERNAME'],
+                        recipients=[morador.email]
+                    )
+                    msg.body = f'Olá {morador.nome},\n\nUma nova encomenda foi registrada para seu apartamento ({ap.numero}{f" - Bloco {ap.bloco}" if ap.bloco else ""}) no condomínio.\nDescrição: {descricao}\n\nRetire sua encomenda na portaria.\n\nAtenciosamente,\nEquipe Portaria Link'
+                    mail.send(msg)
+                except Exception as e:
+                    print(f'Erro ao enviar e-mail para {morador.email}:', e)
+        flash('Encomenda registrada com sucesso! Morador notificado por e-mail.', 'success')
         return redirect(url_for('painel_porteiro'))
 
     # Histórico do porteiro (encomendas registradas por ele)
